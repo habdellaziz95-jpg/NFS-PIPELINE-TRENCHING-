@@ -247,8 +247,22 @@ class NFSDataStore {
       ...JSON.parse(JSON.stringify(DEFAULT_INPUTS)),
       siteTitle:   "NFS East Corridor — Master Tracker",
       description: "East Corridor — Trenching, Conduit Installation & Backfilling",
-      surveyedNear: 0, surveyedOff: 0,
+      surveyedNear: 0, surveyedOff: 0, surveyDate: "", surveySource: "",
     };
+  }
+
+  // East has no survey of its own yet. If it inherited the South/DEFAULT survey
+  // numbers, clear them so the East dashboard shows no false variance.
+  _healEast() {
+    const e = this.corridors && this.corridors.east && this.corridors.east.inputs;
+    if (!e) return false;
+    const inheritedNear = Number(e.surveyedNear) === Number(DEFAULT_INPUTS.surveyedNear);
+    const inheritedOff  = Number(e.surveyedOff)  === Number(DEFAULT_INPUTS.surveyedOff);
+    if (inheritedNear && inheritedOff && (Number(e.surveyedNear) || Number(e.surveyedOff))) {
+      e.surveyedNear = 0; e.surveyedOff = 0; e.surveyDate = ""; e.surveySource = "";
+      return true;
+    }
+    return false;
   }
 
   load() {
@@ -274,6 +288,7 @@ class NFSDataStore {
           this.permits   = saved.permits   || [...SAMPLE_PERMITS];
           this.lookahead = saved.lookahead || [...SAMPLE_LOOKAHEAD];
           this.corridor  = saved.corridor || 'south';
+          if (this._healEast()) this.save();
         } else {
           // Legacy single-dataset schema → migrate existing data into SOUTH corridor
           this.corridors = {
@@ -3352,19 +3367,18 @@ function importFromExcel(file, store, onDone, onError) {
         if (strAt(41, 3)) newInputs.approvedByMDR      = strAt(41, 3);
         if (strAt(42, 3)) newInputs.approvedByQE       = strAt(42, 3);
 
-        // Surveyed quantities — B7=Near, B8=Off, B9=Survey date, B10=Source/Notes (col B = col 1)
-        // (Only present in newer files; older files have "PROJECT INFORMATION" header here.)
-        const b7 = cellAt(7, 1);
-        if (typeof b7 === 'number' || (typeof b7 === 'string' && /^[\d.,]+$/.test(b7))) {
-          const n = numAt(7, 1); if (!isNaN(n)) newInputs.surveyedNear = n;
+        // Surveyed quantities — A7='Near Surveyed', A8='Off Surveyed' (label col A=0, value col B=1)
+        // ALWAYS set from the file so a corridor never inherits another corridor's survey.
+        // A blank value cell means "no survey yet" → 0.
+        if (/surveyed/i.test(strAt(7, 0))) {
+          const n = numAt(7, 1); newInputs.surveyedNear = isNaN(n) ? 0 : n;
         }
-        const b8 = cellAt(8, 1);
-        if (typeof b8 === 'number' || (typeof b8 === 'string' && /^[\d.,]+$/.test(b8))) {
-          const n = numAt(8, 1); if (!isNaN(n)) newInputs.surveyedOff = n;
+        if (/surveyed/i.test(strAt(8, 0))) {
+          const n = numAt(8, 1); newInputs.surveyedOff = isNaN(n) ? 0 : n;
         }
-        if (cellAt(9, 1) !== '') {
+        if (/survey\s*date/i.test(strAt(9, 0))) {
           const dStr = fmtDateFromExcel(cellAt(9, 1));
-          if (dStr && /^\d{4}-\d{2}-\d{2}$/.test(dStr)) newInputs.surveyDate = dStr;
+          newInputs.surveyDate = (dStr && /^\d{4}-\d{2}-\d{2}$/.test(dStr)) ? dStr : '';
         }
         if (strAt(10, 1) && !/^[a-z\s]+\(You\)$/i.test(strAt(10, 1))) {
           newInputs.surveySource = strAt(10, 1);
@@ -4277,7 +4291,7 @@ function MasterDatabase({ store, onUpdate, tweaks, corridor='south', setCorridor
             ⭱ Import {corridor === 'east' ? 'East' : 'South'} Excel
           </button>
           <input ref={xlsxRef} type="file" accept=".xlsx,.xls" style={{display:'none'}}
-            onChange={e => { if (e.target.files[0] && onImportExcel) onImportExcel(e.target.files[0]); e.target.value=''; }} />
+            onChange={e => { if (e.target.files[0] && onImportExcel) onImportExcel(e.target.files[0], corridor); e.target.value=''; }} />
         </div>
       </div>
       {/* Summary Cards */}
@@ -4942,12 +4956,22 @@ function App() {
     }).catch(() => setToast('Import failed — invalid file'));
   };
 
-  const onImportExcel = (file) => {
-    const corrName = store.corridor === 'east' ? 'EAST' : (store.corridor === 'overall' ? 'SOUTH' : 'SOUTH');
-    if (!window.confirm('This will replace the Master Database for the ' + corrName + ' corridor with this Excel file, and merge its Permits and Look-Ahead into the shared registers.\n\nContinue?')) {
+  const onImportExcel = (file, forced) => {
+    // Resolve the target corridor EXPLICITLY — never inferred from the current view.
+    let target = (forced === 'east' || forced === 'south') ? forced : null;
+    if (!target) {
+      target = window.confirm(
+        'Which corridor is this Excel file for?\n\nPress OK  →  EAST corridor\nPress Cancel  →  SOUTH corridor'
+      ) ? 'east' : 'south';
+    }
+    const label = target === 'east' ? 'EAST' : 'SOUTH';
+    if (!window.confirm(
+      'This will REPLACE the ' + label + ' corridor Master Database with this file.\nPermits and Look-Ahead will be MERGED into the shared registers (nothing deleted).\nThe other corridor will not be touched.\n\nContinue?'
+    )) {
       return;
     }
-    setToast('Importing Excel data…');
+    store.corridor = target;   // force exact target — no guessing, never 'overall'
+    setToast('Importing ' + label + ' Excel data…');
     importFromExcel(
       file,
       store,
@@ -4958,7 +4982,7 @@ function App() {
         if (permitCount) parts.push(`${permitCount} permits`);
         if (laCount)     parts.push(`${laCount} look-ahead items`);
         if (scopeCount)  parts.push(`${scopeCount} scope rows`);
-        setToast(`✅ Imported ${parts.join(' + ')} from Excel`);
+        setToast(`✅ Imported ${parts.join(' + ')} into ${label} corridor`);
       },
       (errMsg) => {
         setToast('❌ ' + errMsg);
