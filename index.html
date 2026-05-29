@@ -180,6 +180,19 @@ const DEFAULT_SCOPE = [
   { activity: "Rock Backfill (2-6m WD)",         totalQty: 12169, uom: "m³", dailyRate: 100 },
 ];
 
+// East corridor scope (from NFS East Master Tracker — Inputs sheet, Scope Quantities)
+const DEFAULT_SCOPE_EAST = [
+  { activity: "Excavation Nearshore (0-2m WD)", totalQty: 32831, uom: "m³", dailyRate: 100 },
+  { activity: "Excavation Offshore (2-8m WD)",  totalQty: 29749, uom: "m³", dailyRate: 350 },
+  { activity: "Bedding (0-2m WD)",               totalQty:  3645, uom: "m³", dailyRate:  30 },
+  { activity: "Bedding (0-8m WD)",               totalQty:  4174, uom: "m³", dailyRate: 100 },
+  { activity: "HDPE Conduit Installation",       totalQty:  2180, uom: "m",  dailyRate:  50 },
+  { activity: "Sand Backfill (0-2m WD)",         totalQty: 20919, uom: "m³", dailyRate:  60 },
+  { activity: "Sand Backfill (2-8m WD)",         totalQty: 10925, uom: "m³", dailyRate: 200 },
+  { activity: "Rock Backfill (0-6m WD)",         totalQty:  8267, uom: "m³", dailyRate:  50 },
+  { activity: "Rock Backfill (2-6m WD)",         totalQty:  4318, uom: "m³", dailyRate: 100 },
+];
+
 // Sample DPR data pre-filled
 const SAMPLE_DPR = [
   { dprNo:1,  date:"2026-02-09", day:"Mon", rain:"No",  type:"Clear", tMax:28, tMin:18, offshoreToday:45,  offshoreCum:45,   onshoreToday:12,  onshoreCum:12,   rockOffToday:0,  rockOffCum:0,   rockOnToday:0,  rockOnCum:0,   indMP:8,  indHrs:64,  dayMP:35, dayHrs:280, ngtMP:30, ngtHrs:240, equip:12, safeHrs:584,  cumSafeHrs:584,  permits:4, hit:2, comm:1, tbt:2, incidents:0, audits:1, notes:"Mobilization day" },
@@ -291,7 +304,7 @@ class NFSDataStore {
             },
             east: {
               inputs: this._normInputs(saved.corridors.east ? saved.corridors.east.inputs : null),
-              scope:  (saved.corridors.east && saved.corridors.east.scope)  || [...DEFAULT_SCOPE],
+              scope:  (saved.corridors.east && saved.corridors.east.scope)  || [...DEFAULT_SCOPE_EAST],
               dprLog: (saved.corridors.east && saved.corridors.east.dprLog) || [],
             },
           };
@@ -310,7 +323,7 @@ class NFSDataStore {
             },
             east: {
               inputs: this._eastInputs(),
-              scope:  [...DEFAULT_SCOPE],
+              scope:  [...DEFAULT_SCOPE_EAST],
               dprLog: [],
             },
           };
@@ -348,7 +361,7 @@ class NFSDataStore {
   reset() {
     this.corridors = {
       south: { inputs: this._normInputs(null), scope: [...DEFAULT_SCOPE], dprLog: [...SAMPLE_DPR] },
-      east:  { inputs: this._eastInputs(),     scope: [...DEFAULT_SCOPE], dprLog: [] },
+      east:  { inputs: this._eastInputs(),     scope: [...DEFAULT_SCOPE_EAST], dprLog: [] },
     };
     this.permits   = [...SAMPLE_PERMITS];
     this.lookahead = [...SAMPLE_LOOKAHEAD];
@@ -398,7 +411,7 @@ class NFSDataStore {
               },
               east: {
                 inputs: this._normInputs(d.corridors.east ? d.corridors.east.inputs : null),
-                scope:  (d.corridors.east && d.corridors.east.scope)  || [...DEFAULT_SCOPE],
+                scope:  (d.corridors.east && d.corridors.east.scope)  || [...DEFAULT_SCOPE_EAST],
                 dprLog: (d.corridors.east && d.corridors.east.dprLog) || [],
               },
             };
