@@ -253,16 +253,25 @@ class NFSDataStore {
 
   // East has no survey of its own yet. If it inherited the South/DEFAULT survey
   // numbers, clear them so the East dashboard shows no false variance.
+  // East has no survey of its own yet. If a survey value was inherited from the
+  // South corridor (or the baked-in DEFAULT), clear it so East shows no false variance.
+  // Each value is checked independently.
   _healEast() {
     const e = this.corridors && this.corridors.east && this.corridors.east.inputs;
+    const s = this.corridors && this.corridors.south && this.corridors.south.inputs;
     if (!e) return false;
-    const inheritedNear = Number(e.surveyedNear) === Number(DEFAULT_INPUTS.surveyedNear);
-    const inheritedOff  = Number(e.surveyedOff)  === Number(DEFAULT_INPUTS.surveyedOff);
-    if (inheritedNear && inheritedOff && (Number(e.surveyedNear) || Number(e.surveyedOff))) {
-      e.surveyedNear = 0; e.surveyedOff = 0; e.surveyDate = ""; e.surveySource = "";
-      return true;
-    }
-    return false;
+    const isInherited = (val, key) => {
+      const v = Number(val) || 0;
+      if (!v) return false;
+      if (v === Number(DEFAULT_INPUTS[key])) return true;       // matches baked-in default
+      if (s && v === Number(s[key]))         return true;       // matches South's current survey
+      return false;
+    };
+    let changed = false;
+    if (isInherited(e.surveyedNear, 'surveyedNear')) { e.surveyedNear = 0; changed = true; }
+    if (isInherited(e.surveyedOff,  'surveyedOff'))  { e.surveyedOff  = 0; changed = true; }
+    if (changed) { e.surveyDate = ""; e.surveySource = ""; }
+    return changed;
   }
 
   load() {
