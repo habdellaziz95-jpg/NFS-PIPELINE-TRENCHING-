@@ -117,11 +117,11 @@ const DEFAULT_INPUTS = {
   approvedByMDR:  "Abdallah",
   approvedByQE:   "",
 
-  // ── Surveyed quantities (from Inputs sheet rows 7-10) ──
-  surveyedNear:   7772,
-  surveyedOff:    13934,
+  // ── Surveyed quantities (South constant — from NFS South Tracker) ──
+  surveyedNear:   7771.5,
+  surveyedOff:    13934.4,
   surveyDate:     "2026-04-28",
-  surveySource:   "Pre-construction Survey Report — Apr 2026",
+  surveySource:   "MDR survey 28-Apr-2026; announced in DPR-138 (13-May).",
 
   // ── Scope totals (full project) ──
   nearshoreTotal: 11607,
@@ -300,7 +300,7 @@ class NFSDataStore {
             south: {
               inputs: this._normInputs(saved.corridors.south ? saved.corridors.south.inputs : null),
               scope:  (saved.corridors.south && saved.corridors.south.scope)  || [...DEFAULT_SCOPE],
-              dprLog: (saved.corridors.south && saved.corridors.south.dprLog) || [...SAMPLE_DPR],
+              dprLog: (saved.corridors.south && saved.corridors.south.dprLog) || [],
             },
             east: {
               inputs: this._normInputs(saved.corridors.east ? saved.corridors.east.inputs : null),
@@ -309,8 +309,8 @@ class NFSDataStore {
             },
           };
           if (saved.corridors.east && !saved.corridors.east.inputs) this.corridors.east.inputs = this._eastInputs();
-          this.permits   = saved.permits   || [...SAMPLE_PERMITS];
-          this.lookahead = saved.lookahead || [...SAMPLE_LOOKAHEAD];
+          this.permits   = saved.permits   || [];
+          this.lookahead = saved.lookahead || [];
           this.corridor  = saved.corridor || 'south';
           if (this._healEast()) this.save();
         } else {
@@ -319,7 +319,7 @@ class NFSDataStore {
             south: {
               inputs: this._normInputs(saved.inputs),
               scope:  saved.scope  || [...DEFAULT_SCOPE],
-              dprLog: saved.dprLog || [...SAMPLE_DPR],
+              dprLog: saved.dprLog || [],
             },
             east: {
               inputs: this._eastInputs(),
@@ -327,8 +327,8 @@ class NFSDataStore {
               dprLog: [],
             },
           };
-          this.permits   = saved.permits   || [...SAMPLE_PERMITS];
-          this.lookahead = saved.lookahead || [...SAMPLE_LOOKAHEAD];
+          this.permits   = saved.permits   || [];
+          this.lookahead = saved.lookahead || [];
           this.corridor  = 'south';
           this.save();   // persist migrated schema
         }
@@ -360,11 +360,11 @@ class NFSDataStore {
 
   reset() {
     this.corridors = {
-      south: { inputs: this._normInputs(null), scope: [...DEFAULT_SCOPE], dprLog: [...SAMPLE_DPR] },
+      south: { inputs: this._normInputs(null), scope: [...DEFAULT_SCOPE], dprLog: [] },
       east:  { inputs: this._eastInputs(),     scope: [...DEFAULT_SCOPE_EAST], dprLog: [] },
     };
-    this.permits   = [...SAMPLE_PERMITS];
-    this.lookahead = [...SAMPLE_LOOKAHEAD];
+    this.permits   = [];
+    this.lookahead = [];
     this.corridor  = 'south';
     this.save();
   }
@@ -3380,22 +3380,44 @@ function importFromExcel(file, store, onDone, onError) {
         if (strAt(22, 3)) newInputs.planningEngineer = strAt(22, 3);
         if (strAt(23, 3)) newInputs.preparedBy       = strAt(23, 3);
 
-        // Scope quantities — rows 27–35: B=activity, C=qty, E=UoM, F=daily rate
+        // Scope quantities — rows 27–35. Columns can shift due to MERGED cells
+        // (Total Qty merged C:D, Daily Rate merged F:G), so read by scanning the
+        // row's numeric cells rather than fixed column indexes.
         const newScope = [];
         for (let row1 = 27; row1 <= 35; row1++) {
-          const act = strAt(row1, 1).trim();
-          const qty = numAt(row1, 2);
-          const uom = strAt(row1, 4).trim();
-          const rate = numAt(row1, 5);
-          if (act && !isNaN(qty)) {
-            newScope.push({
-              activity: act,
-              totalQty: qty,
-              uom: uom || 'm³',
-              dailyRate: isNaN(rate) ? 100 : rate,
-            });
-            importedScope++;
+          const rowArr = aoa[row1 - 1] || [];
+          const act = String(rowArr[1] ?? '').trim();   // col B = activity
+          if (!act) continue;
+          // Collect the numeric cells AFTER the activity name (cols C onward),
+          // ignoring blanks created by merged cells. First number = Total Qty,
+          // last number = Daily Rate. UoM is the first text token among them.
+          const nums = [];
+          let uom = '';
+          for (let c = 2; c < rowArr.length; c++) {
+            const cell = rowArr[c];
+            if (cell === '' || cell === null || cell === undefined) continue;
+            if (typeof cell === 'number' && isFinite(cell)) {
+              nums.push(cell);
+            } else {
+              const s = String(cell).trim();
+              // a numeric string (no letters) counts as a number
+              if (/^[\d,]+(\.\d+)?$/.test(s)) {
+                nums.push(Number(s.replace(/,/g, '')));
+              } else if (!uom && /^(m³|m3|m|km|no|ea|nos)$/i.test(s)) {
+                uom = s;
+              }
+            }
           }
+          if (!nums.length) continue;
+          const qty  = nums[0];
+          const rate = nums.length > 1 ? nums[nums.length - 1] : 100;
+          newScope.push({
+            activity: act,
+            totalQty: qty,
+            uom: uom || 'm³',
+            dailyRate: rate,
+          });
+          importedScope++;
         }
         if (newScope.length) store.scope = newScope;
 
@@ -3406,14 +3428,26 @@ function importFromExcel(file, store, onDone, onError) {
         if (strAt(41, 3)) newInputs.approvedByMDR      = strAt(41, 3);
         if (strAt(42, 3)) newInputs.approvedByQE       = strAt(42, 3);
 
-        // Surveyed quantities — A7='Near Surveyed', A8='Off Surveyed' (label col A=0, value col B=1)
-        // ALWAYS set from the file so a corridor never inherits another corridor's survey.
-        // A blank value cell means "no survey yet" → 0.
+        // Surveyed quantities — rows 7-10. Value cells are MERGED (B7:I7, B8:C8…),
+        // so scan the row for the first numeric value after the label rather than
+        // trusting a fixed column. Blank = "no survey yet" → 0.
+        const firstNumInRow = (row1) => {
+          const rowArr = aoa[row1 - 1] || [];
+          for (let c = 1; c < rowArr.length; c++) {
+            const cell = rowArr[c];
+            if (cell === '' || cell === null || cell === undefined) continue;
+            if (typeof cell === 'number' && isFinite(cell)) return cell;
+            const s = String(cell).trim();
+            if (/^[\d,]+(\.\d+)?$/.test(s)) return Number(s.replace(/,/g, ''));
+            return NaN; // first non-empty cell is text (e.g. a label) → no number
+          }
+          return NaN;
+        };
         if (/surveyed/i.test(strAt(7, 0))) {
-          const n = numAt(7, 1); newInputs.surveyedNear = isNaN(n) ? 0 : n;
+          const n = firstNumInRow(7); newInputs.surveyedNear = isNaN(n) ? 0 : n;
         }
         if (/surveyed/i.test(strAt(8, 0))) {
-          const n = numAt(8, 1); newInputs.surveyedOff = isNaN(n) ? 0 : n;
+          const n = firstNumInRow(8); newInputs.surveyedOff = isNaN(n) ? 0 : n;
         }
         if (/survey\s*date/i.test(strAt(9, 0))) {
           const dStr = fmtDateFromExcel(cellAt(9, 1));
