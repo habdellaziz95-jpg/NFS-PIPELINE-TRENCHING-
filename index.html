@@ -77,6 +77,8 @@
 // All state lives here; persisted to localStorage automatically
 
 const NFS_DATA_KEY = 'nfs_tracker_v1';
+const MCD_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAAdPUlEQVR42u1dabAc1XX+zr0925v3tPCEhEBCSGJNwASMsVkUMDbG7KuQAGNXpZL8cFJJlStVcVW2yg+nnIorlR9JVSpVWViMLBabxQYHDDZ4xY7NvspilVi1671Z+96TH7e7p2emZ6a7p+e9N+KeqkZC08tdvnv2ey4xM8OSpXkiYYfAkgWgJQtAS5YsAC1ZAFqyZAFoyQLQkiULQEsWgJYsWQBasgC0ZMkC0JIFoCVLFoCWLAAtWbIAtGQBaMmSBaAlC0BLliwALVkAWrJkAWjJAtCSJQtASxaAlixZAFqyALRkKYqccWpsFlVsiBZq3xhAuHF+Z2ns+3ZIAFBpF1Jk01ytGUIsjNnSHvBEF3ooxRhpSDFeQo3GqTpWs7Ef9boLIkJ7o1vcgwAwuGsCCYBijUVTEwAmwMygBcMyXMwc3AcSAsztnKz37Jg+kvc3KQml0tK2sbAcMENuddt/PoFvfP0lgEsAq0BsEZERX+RNBnMgzsITSURQLLB4qcQ//9sGfPJTa+aVE/rrfveHe/Enf/B9PPdcHTmH2wFH1BOBbQtIOGi4CjdsXoe//to5EEIuoMU1xhzQH+R9+/bj9JO24IP3VqKYZ7CW3iLXLf7GhIAd9CDpEPbWajj7TOCxn10BIgckyOMjc6xSuC6k4+Cvvno//uEfd2N5cRquG78dDAYR+7MIrQlVt4InfnYuzjxrNbRiCEmWA2ZB1WoTwBTKJUBI3eIK5AGQKZ7YES5W5CWe+Y2LX/x8J845dy2UYkg59wtLSgcH9u/FA1vfw/LCcuRyDQjp9F9BXexDB3AUQsKdcbB3F/cwaqwbZgjLVYC1gNYM1gLM5F3CuyjepR0wBOou41u3vDl/BpVigICHHngBr7/hIJd3oJT01AdKcRndkbUB4jjRGJlMGoBodzUwxed+3v1aESbzOTz8wAf44IN9kJIw11qI0TtdbL19J4jK0NQE0zAci0BkTK9xK7g8VjY7M3sW7nDvyBcdvP2+iwfv22GgreZu1nzD57nn3sTPnqigXCpl8n0fvgSyABwVByTiTIaXNVCgHO66bTuYXRippedmEXmfuWfLy9hfzUE6nM3YsABA4Dnqx0cKgC0RmQ2n0qxQKjt48slZPP3rd0EkoJWaG+PDIRw4uA/fuWs3JnJTYO1mrC9bDjgCIwQgNu6STEQME0gyZhs53HHLbz1wjF55V56ofeTBl/Dqb10Uiw60loHwTKP7pX/WAjCZkg0CcXYDrV2Bcj6PB+79EHv3HIB0xMgVeBIA0MTWW9+EgyUAmoanB8ZU8oXUbYSxBeCIMGhcDRmhhBkoFAlv7WB87763PGNkdPqT1gwpBF55aQce/1Ed5VI+4IiZD5QF4Aj0JwKMnp3dADMz8pTD1tvfAsOFGGEg3183W259EQcrBTg5lTlYGIDyOCCPiS44HjogyJMs2Q6qVhoTE3n8/KezePY3H4IERsKVmE2ywMzMQdx/1weYyJWgNI9stCwHHMWYkv8XzvTFwlGYrSvcveU1DyzZi2Gtmsb4eOQlbNvOKBYleAQAJADCGx9iC8CMhcto9Gt2FSadMu67+y3s2z8Lx8k6MsIgIQEobL11OwiLQFAA5MjW6jgZI2Jc4McjEMEAoJlQLGlsf4Px/YfeACAyNUa0BoQQ2PbyW/jJIxWUSw6U0hiV49uG4kY2qjwicBMUGILyuPvW1wFoUIbGiC9q77n7ZeyZLULkBPQI9bTAm0MWgNmJFaKRevi1AiYnJH7yo1k8//yHEIKgM9DRmAEhCZXqQXx7yzsoyiloPV6hMgtA3w5mGLEVFxfEECK+Ni4ciX1Vxp23bfM4VxbiV4OI8Pijr+KlF4HSRLz3EhiSWgZFvz6a/nGEEmh1wOxhmEDBYS1Qrbqxu6iVRtkp4bv3vI+ZmQqkM7w+ZcKGGltu3QZgEoLjPifQaCiwHtR2Dl2RZpsFYDYqoOdaoHjBdmaGkIxjT5QAN30Pdn/FSAPlosSr2xt4+MHXARC0VkO1WUjCa6/txKM/OIhysQwV431EgKsUjlzNyJdcaD2+cd5Dyg2jmKEhvMTNARPYBCYX1fHQExfgtI8rVOraS7nivrxEkQIoj9tveQ2AGiroojxL+p6tL2H33jKcPA80PogApYBiQeN7j1+As86bwGzNhey1t4OFt7hEh7dgfKyQsTFChKDYsWAigmSBZYeVselLa1DTByDICe2h6AEazZgsOvjp4zPY9vIuCCHSGSMMSCnQaMzgO1veR0lOxuKmQhBmak2cc/4irFq1FKSTWf/jmBczJiLY6H9Eqj0dK0oJ938SApVZF5dfdRJWLxeo1V3QoO4y4OQIB2aBO7e8ZsyBFMaI0mY33xM/fBUvvKAwMUHQOh6AGAqbvrQOzATXHRAv7uj/6JxV1ggBwBDozIjuPeQkgFpNYXp6MT53yRJU6s1Yu9+01ig7E/jOnTtRrVa9PSNJjQ/Ttm/+12tQuhQLFkIQqrUmTlxfxmcuWgUiQDg0cEzGE3ZjagVzYhiYjd7X37wWeTELaBkprsN/1xrITwi89EoVjz28A6Bke0a0NsbHm2+/h8ce2RMYH4OMJ5IalWYDV167DFPlIgAGkUgkUq0IHiFpCO+KUsIjhp0JUppddOdsWIdTTyviYFUhKsjhgyOwtqEALuGO27fD7EVJ0E7tGx/P4oO9eRRyDLAYqLvqpsDiksDGLxwTcDWCTLToGAgZadYPOAL+l0YWMvK5Eq698QjU1WxXzl+rlEcIDEpjslTAEw/vwhvbP4SQFDOCwcb4qFfw7dvewYRcAs3Nge0WkjBbbeJTZ0/hd09eAdfVxg3EOgUHtOlYI7GCDZdKMLik2zSyq69bjyOWKDTqhEEeYWYBJ6+w+4CDe+82WzfjpE8p5Rkfj7+C555XKJYklPbaQr0WEBvXETew6cZ1APmWN7VKb/RsKLUydclsWeUxCwaPEQdMP6Cu62L10Ufi0xctQrXegIwRkmBFKMg8vr31HTSadYhY9TuM3rnltpeh9BJAaHAwxD2MJZKo1+s4+sgSLr5ylVE2/IJJA03w8Kak8TRExqxCaspBZgYgsPHmdSDMBHtoBxkTpYkcnn7mAH78w3c9J3EfRzYzpCS8+ebb+MH3ZjFZzMcwXghCaszUNS6+cjmWTE9CuRokqNXsUY6LBWDc4WWY/DlCWx4daU/UDtKxHICB8y9YjxNOzKFSJZAYrNMJcuHqHLbe+vLAifbBee+dL+PDvTnk8iEA9TSWGFpLFB3G5puPMb+TDMyugVzf7z/p0Pu1NUJGJXzjxoKjdEilGBOlMq7ZvBI1dzZWJVHtEiaLOTz8v3uwc8de4xPsoQuayEcFd255F0WnDFZxIh9ArdLEx88o44wzVwR7R3zsEB3aceAxE8EhjhBEABKA0OvpdTecgEVTVbhN0cFguOu9DCBfEHh3l8R9d20zDpoIACrXuGp+/MSrePZZhVKpgDbpS9x9wTifK7qJTTetg5ROED827RI93D/cs/9hM83uCRmp/hfHJdPukPCTTI87fjnOPW8RZqpNSEF9XT0Mk6xaknnctWUn3GYjOjHAc/dsvW07lFoEkO6I2XDXRQQ06sCRhwlcftVq48LpdBH17GN3//1gnHVEL2QeqhUABzfcdCwYMx5b5IHGyERJ4Kmna/jlL3Z64lx3GB8C7773Ph59cD8mC4OMD8OnpCQcrNdx4SXTWLlqkXHhiGGX6PjFQg5hN0w3/5DSFIS96NLjcdxaQq2mEWf7hxCA23Sw5ZuvdbXFT3K5+44X8d4uB/lCH+s18NsBzASHmth449qefUviVPbv1MTBpywAsxbCEVGLJN4JIkC5jMmpMi69dhmqjWosY0QpRrGQx0P37sGHHxxoK2opJMF167jnjp3Iy3KsiAkJgUqlgY+dVMLvX7DKJK+Kj+aZQeNTmoMNP4hUzIlDLpl4xsg1m9djIt+Eq0I8JHCXdH+7WADeeV/h/nt/GxgeSrnG+PjpNjz9TAXlYiFW2pUUhKpycdmmNSgUctAqm4ojNhlhpBKYMpkl3xg5/fS1+NS5DmYrKl41ea1REDncdctOaFX3njF+t63/8ypcdylIuDEgQHCbGkvLEtdtXtu2KAYrEYMZvs0HHGFDs1rdrBlEOWy88WgonoHoq/0bJ7hijVIpj1//cga/+dW7EEIY4+Od9/HId3ejXChCaQ1ARVi9LfBJR2Om1sB55y/Bcccvhda6z1kldAjxuhEBkFlDx7yGqbtCvqTNwG7xC8lfevkJOHqFg2atV75ey+fGLE1RS5dw5zd3AFDQmnDfvS/inV0lOAWCZhFqaIS/zitErplx3U2rYDKuVQ/dlSPVgeBMlF5WBi/secwYgCZpUsS8aEg/A7OOZYRw53lXXdKcoJSLZcuncdE1U5hpVCHk4PdqpTGRK+D+e3agUqlDCBdb/vstFOVkNJAitIhaFVi3VuCzlx4NQMdMchihsyBo29zNY5iGOKhGg5mwc/dL2N94B0zSaC2BIdBqpGBzKF/RWYz10x/zDmRJdioQs/bSsiIqmYarhBJAwuMsPEiEETZuPgG3/sdPAD2B7vhrO6dhBvJFws53gX/9xv/hqDUCzz4FFEtsDh0ktLhWRPqVkISZZhVXXLkaSxaVoVwF6cjEiz4qzMEpXDfBk5rw5t4XcKD5HkzRpFZ8nYKtdgQIgDVhUX4xVk+f6mVsi7kHoAGDwPZdT+LhHf8Ena+FFh+FTulpO6wNrlvDefrLOO2IK4N3xF7U1H4OXBL3S6QlKiWYgTPPOhof+70ynnlKoxRj85DWjKlyHl//u50AFErlxYi9cc4lTOYkNt54TMB1smR8lFAGB/O45xl8f8ffA7lmkFsYmEAc0nuYAGIopXEBfxmnHH5ZonnMmAMCu2rboIozmJDTYHLN6tNhOUCBGi5IoioYHzZeBHAl0hflzo60YuRyRVx301F48tdvYUKUMQhNxBIajMJk2QOkBkGHGCVHtNecDTIz28DZZ0/g1I+vCOrGDCdns7F5d9deAefqKDvT0OwGHJbBXUJEkMSsewC7G9vnXwckmQNYAlqDtbEuNWswNDQraHbB7JrTLbUL1gRCISSi4q5U8x/D8uNOWoz9w17vr75uHVYsVXAbYqCnhz3xxFqDPXbJUVtFGW3GghCEulbYfPNaCJFrC+clW2/9jZCke0gMCCSYJTSa0FDe3CljbOj2i7WCo/2ahwvACGkVj2xFKdoNhVZlK6KUq9bzQDPr2L6xOKlMQpg0raNWH4HzLprCwVptJCdMEgH1msaqFRKXXLXaUwEoizU0lAFMob/4w+Xr2f3Gz9fJ5x2A3HasfOcVuotbIA16mnCpavQpUh4RCTEDGXfaBG64+VgIMQOhaXBVqliz22qTFAIzdRcXXXI4Dl8+CaUGlP0gf+HqHkZId9TH14xlcIJrgoXEnhHlMRTf29AThKFyIAvHER2nhl/KrQtEyf1/xmCJMQBeDPbTn1mHk0/Mo1pVmRoH/t7komBs+sJaM+SDGsbpuBqBhnDDUJf06ufyEhkly444EhJxgEraAQoq5fNAOzDQG2OCWylGoTCBKzcehYqqgqSIUDP6Xf31zEpV4ZSTSzjr3KO8qllySIOKut1F/q64FCKb0ywq6IUKQA4EQms7JQ9lxTJ6utZa7oGQYt7tqhlcUQsArr1hPZaUNdymbve5xbl6uXuEQM11ccX1K5HLO17iAcVatxyZYBplhBDIg59vxCdLx+KWr69t3qLADi8yxPMPQP/ktv4istWhtHscfP8WEY1k47WfoHD8CStx7vklVGoNCCkwrJuDCGg2NZZNClxz/TrTB0GJxjf9co0vnwjJ54YWggjuTmDnENgi7uAm0laHZ5hky4ErmzRIdIrHGEUttQbgYNONa6C5ZgaYhgf2bNXFhgumse64w6A0I3XaX9jQ6jJCdO8SJUPCtjsJiUCQC8UISeLLG5ZlU6JvJV2gQhrj4MJL12Pteo1arZ68GkMEadahxAMsSGLmnkpzdxIwZ3qOihhJZ3qybJFq2wwzQkov9+AOnboYJwKPv9dj0eIluOzqFag2/Jy/dIMtAdSrjHXH5HDh5xP4/jqs59F6ArtFKlGcQqDsxbgWvBWc5ecGbUDvVggST4Ipq49NNxyPyXwD3EwtL73EgyYuuWI1phaVgrox8XEUrvOSvZSIr89FGyHAAjFCwmw6OhLSzhnTKNaU4OgBI07S62zMwKmnrcInPllApVpHuogTw1USpYLGpi8ckxIaRpfmpCV6k/ifI8aNYx4KxAuAJbVHQjryxMKgbAGSUx19wMwgLUCaBvY8MB5S6ilKaRDlsflLx6HB9VROaXM4TRNnnjGJ086YTpl44EdCKNY0MpkwpfC4ZpxQO3VZG60x7OaKvSJdC4ADjl5IJFeF0roJpOeEvuSKY7D6CIVGjRIbNESEhq7h2s1HQ5AzooOpo+GRdoGjIwIyWAdcUEZIv6hAqLYfp0Vg2EE6qCnDrVI/MjJ9+DJccPESHKxXvK2bFGscBBhujXHkMsIVV68xoBZzsOJCqW+xWSD6cbx+OrbIDIJzZITM5QYayqBbZkI33/w7KMo6WPtZwoOHU0qB2XoNF168EkcctQjKVekrHlCC9noLj1PkeiQeG85ODGcCQBOh6DbnIzkWp+947HNChuyPlCbt/5wNq3HqKUVUao3Y+W+sBaRgbPziMZ5zmFMugGRqBMeyaHu7uZKtigXmB2RuD4O3HLjh6p0mFYspXeibSHvX4Jp5TCrxntoup49iOE4Rl99wFKrubKyqqoKAStXFSSeVsGHDapPolXD/S9jsNzl3cWogipabKo23odPLEhiUFO2OIZMFvmCs4HCMNuyKifKipzVcfO9KPA44fMTYZ3jXblyPI5YAjcZg/VNIoKoauPz6lcgXHGjFQ+6lj9+PNJFDbpMuSYwQLAwO2AJde2Wm1uGC1MUN00yIvzeBkzi6hkQgEUErhbVrV2DDZ8uYrTa9OG7vF7tNxtIyYePm9eYdIvXKDkAVDwYtDskpkxEwT8Uw59wNw6nnhIZoMqf8JgOQuPbG9SA6AEAC5PbQGwkzVRfnnrcUxx8/Da1Vn4oHMXtMyfoXztFLlBfI81fQYzgdMCbbj5tl2/MzbKIURi1RQYaGIA5dCC5fXxs2aVIICWaNCy86Fiec4KBeM4cmhr8lCCD/cGw0semLa4ybYmgVyexDkMI4PQS87wJd3xeeZJBCBBulEieKzBMIh9MBmVvH5EWUbPB1ifBmJEqUm2puyhcKUM06alWGcgHVNJfrMtwmw22aI1qbTYbrMmZrGgwX+cKQ64sISgHliUlcdc1K7GnsBSuJZpPRbCK4tGLs36eweoWDz31+DZiHrHjggSHnNFDRTWilvb4Crougv+ZiNJsSzaaLulYoFyn28AZT0bNSbPIM8KTkZPYmQpchEgYiBdZwkgwVsxF86dIp/PlfnIR//5d3IURr04z2zQ3S3rZNs3VzaqmLv/ybkzFRKkBpHasGYG+XjNlo/8d/+gn86heP4fnn68g5rWNcCSaJYel0A3/7tdMxtbgIrTSG2bVIZErC/dGfnYIXXvwVDuxmMDWguVuHNtJAQjVyuPyyw3DGOUd49QZlzOWdDlO8EADIEZuww3Hfvr2OiUVfj/rKVzfgD79cQb2OYN+t4aYUsFXyvl+ckJicLIFZQQ65f5U8S2DFyqW4/9GrsWvXLIhlmH9AQ2NiIodyuRDa8zGMBe77Idfj50+vxr69Da8kSXt1Jgpr4wI4bLqEJBGn4DaKY8GNRkRnwgGjXABmFYfcWjxcN7QGFi2aSHB/PC4Ql7ubHaUCy5ZNDfgmZfJBInNQkpPLY9nyfGzJnTaHdr7MECezGYr23nUZ/GmVXSGSGDCUERDaF1R/I2oE3wx2cGa3Gb+nG2YcAdjmBwzCcRxk1SL0O6FDOaY0IJj/ooxz3QaiDJyacRY4UWy4ZtkikdUgUR+/0kfhxJ9xJB5fEdxKywF7ewj67EAzVnCH5cE4VKrMji1RWHfsCc3RTpLIohuDd4+xne0x4oZzSdlVx7LcbHw5Ic0fBFOK4JAzj7xSXcSe6yWcy0bdWLVAXYAI5Lb0qvZCRRzJKxeEIzporJcv1b7LqtXM4JhVsgbJWBgkcxgXHhqAwTZIzw0THQkJlexlv4rTOB6rcqiBzpuDHl6LfkCkhQJAv8EU0YHe9xKIpEXAvOt+0vtTdMxdS43qBcIFIoKTHbVAALRqoFLbZ6qrC9EWomM/xuuVG2t9o13vaGmgFEr470x34LCdHrSB0elSDbex/R3td+vQU8F5AEHPOtsUpStRRG/Yz2ljhFrZ4WXo0fb2/vfrFwexUWpTyRkCDhqqAgGJ+TjsyxkWflEO6Kjyrpo18qKEt2efwre2fQVaNrt96p4eGV55ROZkIYrgpBxswvbSpduif2ELXRqYsFfTxHunn8dAnqJqsk28agTceo35NxdEJkEVbBIDWLjwS/y2oj2izUDzgUUeAAIYidbK8xcbR3Ec7/QlCrKeQ1VZmIK0af8bfhVtaq0is8E9VDe9LUedc2BZQV4Wob10ujgieEEAMGozUi8QmsFRcB2AnYOtZUghMHuFAHRnxkznn+HJCfiIV7qNw9zBmyy/lBmLFkbDXMd7L4dLnjGiw9mRrLh9w073vynvOxQAKvJbiPIUhI6g4c7Ck+HfvMrWpKJZRcQYmvfVAPZ2+rLomjN/HrtS7DLilENGQqLFcC8dkCC8hc9e5gZ1vYqZIaNiRBye7IgWEYF0qwi6X9JXdDzDPvOJ8i50vtsccNKqmeJNnp/p014nPKo0aUjM+pw6zIrCjIxDiRocPXpMBKER7CwUoEBqMLFXIIx6PBtqL7cWodA+InsfURHFCbNKYBjOD0iIDb722ynzPTBGlApvcLnvfb3a3D3QZOrRtAEsBKR+rqnQ+3xQ9PoOeWKYI5+nNg7ou7I6yxC3+kWREqmz34T2zUixTqBaiG6YhWXWZWyi9Sj7zSNQ1HlkNy9sygSAzNyyAfqcLxFe+eF7Yp2AGegtcQPlEWKDBn+vn+sh7j3cp9po+u+2i2cKqXZJ29Hr9865W/BGSKf/r1dH0gxO2oWQ5veku/ZG3fa475+PMcyaxKgnvF/J3iSV86NPQ2i3JlJX4U9Ywb/TUjzUwotz2aeh/YD9OGFnJzrZe7iQUdzVN0hEdIqyQaKty2CIeL6XWwkx+hzn273Uk/71tpM/lwaIo+aIw1VGYFOuv0spH/YU0mELcQ46p7rXfUTpvz8sw6CM3hO3TUN8h4nn2w3j90F76fit0rvkO4AHrEzRUc7X/zfuKGDUBW7u7Yvyv2ve07q/c/NNUFQp1E7hVYMyz/fyY1JPPdc/q6h7LVJfu4JCfkuOWbzJb3c7t20dZdbaf9O7xvSg34I+drRHsARh+JPShwMg+ewzj6brIpdzoaG61bLAcqVoIPU6UatfQs0AI5GIwCGHtDeSrXvC7wmXYNYhDqgjkmy5xzfTus/CkQmOELFRtRBDbqauNHoOhTfiuGuinP0UMS4dvwtoNFTDnBM9fxzQtO7Y6bPxXv0V7Gm+DkleiElz7wnhNl9Ie3Q+7oZ17nD3hbM3/FUt+4w5tb8j+EGEJj4iEaK/o7Hjvs7HqZ+DkqLfR9xzLLgf1wqNhZ8gzN1+qFAcnnuMT2dqhPl/xS4OnzwBpxz2uaFqcbfUuNRaZmt0GqoysJp8ln72zP3NqXo96ocWKLFGThQA8ssWi/kCIABW3qoSsPRRIg2GAiE3PDPhTOzsXks8TimsQSKOhmhT3PdGtb9LjsbkuzRA4YtqDyUYsyj1YJgdiRRjHkfHzjMCoCVL6cjKTksWgJYsAC1ZsgC0ZAFoyZIFoCULQEuWLAAtWQBasmQBaMkC0JIlC0BLFoCWLFkAWrIAtGTJAtCSBaAlSxaAliwALVmyALRkAWjJkgWgJQtAS5YsAC1ZAFqyZAFoyQLQkiULQEsWgJYstdH/A8bKPlnIjSNOAAAAAElFTkSuQmCC";
+window.MCD_LOGO = MCD_LOGO;
 
 const DEFAULT_INPUTS = {
   // ── Branding & Header ───────────────────────────
@@ -419,10 +421,10 @@ class NFSDataStore {
   // Computed KPIs
   get kpis() {
     if (this.corridor === 'overall') return this._overallKpis();
-    return this._kpisFor(this.corridors[this.corridor] || this.corridors.south);
+    return this._kpisFor(this.corridors[this.corridor] || this.corridors.south, this.corridor);
   }
 
-  _kpisFor(ds) {
+  _kpisFor(ds, corridorKey) {
     const log = ds.dprLog;
     const maxOf = (arr, key) => arr.reduce((m, r) => Math.max(m, r[key]||0), 0);
     const sumOf = (arr, key) => arr.reduce((s, r) => s + (r[key]||0), 0);
@@ -472,8 +474,10 @@ class NFSDataStore {
       return hasMP && prod === 0;
     }).length;
     // Reported vs Surveyed variance (Reported = peak cumulative; Surveyed = saved value)
-    const surveyedNear = Number(ds.inputs?.surveyedNear) || 0;
-    const surveyedOff  = Number(ds.inputs?.surveyedOff)  || 0;
+    // East corridor has no survey reconciliation yet → never show survey/variance for East.
+    const isEast = (corridorKey === 'east');
+    const surveyedNear = isEast ? 0 : (Number(ds.inputs?.surveyedNear) || 0);
+    const surveyedOff  = isEast ? 0 : (Number(ds.inputs?.surveyedOff)  || 0);
     const reportedNearPeak = nearshoreCum;     // peak cum, already maxOf(J)
     const reportedOffPeak  = offshoreCumM3;    // peak cum, already maxOf(N)
     const varianceNear = surveyedNear ? (reportedNearPeak - surveyedNear) : 0;
@@ -515,8 +519,8 @@ class NFSDataStore {
 
   // Overall = East + South combined
   _overallKpis() {
-    const e = this._kpisFor(this.corridors.east);
-    const s = this._kpisFor(this.corridors.south);
+    const e = this._kpisFor(this.corridors.east, 'east');
+    const s = this._kpisFor(this.corridors.south, 'south');
     const add = (a,b) => (a||0) + (b||0);
     const nearshoreCum  = add(e.nearshoreCum,  s.nearshoreCum);
     const offshoreCumM3 = add(e.offshoreCumM3, s.offshoreCumM3);
@@ -2523,8 +2527,9 @@ window.DPRViewer = DPRViewer;
 // NFS Tracker — Expanded Project Inputs tab
 // Sections: Branding, Team, KPI Labels, Tab Names, Scope, Surveyed, Approval, Reset
 
-function ExpandedInputs({ store, onUpdate }) {
+function ExpandedInputs({ store, onUpdate, corridor='south', setCorridor }) {
   const C = window.C;
+  store.corridor = corridor;
   const Collapsible = window.Collapsible;
   const fmtDDMMMYYYY = window.fmtDDMMMYYYY;
   const [inp, setInp]     = React.useState({ ...store.inputs });
@@ -2604,6 +2609,18 @@ function ExpandedInputs({ store, onUpdate }) {
 
   return (
     <div style={{ padding: 16, maxWidth: 1100, margin: '0 auto' }}>
+
+      {/* ─── CORRIDOR SELECTOR ─── */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap', marginBottom:16, paddingBottom:14, borderBottom:`1px solid ${C.lightGrey}` }}>
+        <div>
+          <CorridorSwitch value={corridor} onChange={c => setCorridor && setCorridor(c)} options={[
+            { id:'south', label:'South Corridor' }, { id:'east', label:'East Corridor' }
+          ]} />
+          <div style={{ fontSize:11, color:C.softGrey, marginTop:6, fontFamily:"'IBM Plex Mono', monospace" }}>
+            Editing settings for the {corridor === 'east' ? 'East' : 'South'} corridor — scope, surveyed quantities and approval names are saved separately per corridor.
+          </div>
+        </div>
+      </div>
 
       {/* SECTION A — Branding & Header */}
       <Collapsible title="Branding & Header" badge="Section A">
@@ -4805,12 +4822,51 @@ function OrgChart() {
 
 function ProjectOverview({ setTab }) {
   const [showOrg, setShowOrg] = useState(false);
-  const zones = [
-    ['Zone A', 'KP 0.000 – 0.980', '3.0 m', '36,456.00'],
-    ['Zone B', 'KP 0.980 – 1.533', '3.0 m', '20,571.60'],
-    ['Zone C', 'KP 1.533 – 2.080', '2.5 m', '13,264.75'],
-    ['Transition', 'KP 2.080 – 2.180', '—', '1,212.50'],
-  ];
+
+  // ── Per-corridor data (from Method Statement NFS-MCD-MO-MST-00201 Rev. 01) ──
+  const corridors = {
+    east: {
+      label: 'East Corridor',
+      length: '2.180', chainage: 'KP 0.000 – 2.180', depthRange: '0 – 8',
+      lines: 'Twin 36" TL23 / TL24  +  12" SC26  +  6" MP26 MEG',
+      excTotal: '71,504.85',
+      zones: [
+        ['Onshore', '—', '—', '—'],
+        ['Zone A', 'KP 0.000 – 0.980', '3.00 m', '36,456.00'],
+        ['Zone B', 'KP 0.980 – 1.533', '3.00 m', '20,571.60'],
+        ['Zone C', 'KP 1.533 – 2.080', '2.50 m', '13,264.75'],
+        ['Transition', 'KP 2.080 – 2.180', '2.50→0', '1,212.50'],
+      ],
+      backfill: [['Sand bedding (0.5 m)', '7,971'], ['Soil backfill', '34,888'], ['Rock cover (0.5 m)', '13,337']],
+      pipelines: [
+        'Twin 36" trunklines TL23 & TL24 (main product lines).',
+        'Piggybacked 12" SC26 conduit alongside the trunklines.',
+        'Piggybacked 6" MP26 MEG (mono-ethylene glycol) line.',
+        'Area 1 (KP 0.000–1.120, 0–2.5 m WD — land excavator + EEX); Area 2 (KP 1.120–2.180, 2.5–8 m WD — excavator barge).',
+      ],
+    },
+    south: {
+      label: 'South Corridor',
+      length: '6.036', chainage: 'KP -0.174 – 5.862', depthRange: '0 – 8',
+      lines: '6" MP25 MEG (40 mm CWC)  +  12" SC25 conduit',
+      excTotal: '61,666.16',
+      zones: [
+        ['Onshore', 'KP -0.174 – 0.000', '1.97 m', '1,285.43'],
+        ['Zone A', 'KP 0.000 – 0.580', '1.80 m', '7,934.40'],
+        ['Zone B', 'KP 0.580 – 2.995', '1.80 m', '33,037.20'],
+        ['Zone C', 'KP 2.995 – 5.762', '1.30 m', '19,064.63'],
+        ['Transition', 'KP 5.762 – 5.862', '1.30→0', '344.50'],
+      ],
+      backfill: [['Sand bedding (0.5 m)', '14,003'], ['Soil backfill', '19,408'], ['Rock cover (0.5 m)', '15,127']],
+      pipelines: [
+        '6" MP25 MEG pipeline with 40 mm concrete weight coating.',
+        '12" SC25 HDPE conduit for subsea cable (LTE to KP 5.880).',
+        'Area 1 (KP -0.174–1.000, dry–2.5 m WD — land excavator + EEX); Area 2 (KP 1.000–5.862, 2.5–8 m WD — excavator barge).',
+        'Includes onshore section from shoreline (KP -0.174) to LTE (KP 0.000).',
+      ],
+    },
+  };
+
   const equip = [
     ['EEX – Hyundai 520LC', 'Excavator (nearshore)', '2.20 m'],
     ['EEX – Hitachi ZX890', 'Excavator (deeper)', '3.70 m'],
@@ -4819,19 +4875,88 @@ function ProjectOverview({ setTab }) {
     ['Vibro Ripper XR42 / XR52', 'Rock breaking', '—'],
     ['BHD1 / BHD2', 'Backhoe dredgers (meet halfway)', '—'],
   ];
+
+  const CorridorFacts = ({ c, accent }) => (
+    <div style={{ background:C.white, borderRadius:6, border:`1px solid ${C.lightGrey}`, borderTop:`3px solid ${accent}`, padding:'16px 18px' }}>
+      <div style={{ fontSize:13, fontWeight:800, color:C.navy, letterSpacing:'0.02em', marginBottom:12 }}>{c.label}</div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(120px,1fr))', gap:10 }}>
+        <OvFact label="Trench Length" value={c.length} unit="km" accent={accent} />
+        <OvFact label="Total Theoretical Excavation" value={c.excTotal} unit="m³" accent={accent} />
+      </div>
+      <div style={{ fontSize:11.5, color:C.charcoal, marginTop:12, lineHeight:1.6 }}>
+        <div style={{ color:C.softGrey, fontSize:10, textTransform:'uppercase', letterSpacing:'0.08em' }}>Chainage</div>
+        <div style={{ fontFamily:"'IBM Plex Mono', monospace", marginBottom:8 }}>{c.chainage}</div>
+        <div style={{ color:C.softGrey, fontSize:10, textTransform:'uppercase', letterSpacing:'0.08em' }}>Pipelines</div>
+        <div style={{ fontWeight:600 }}>{c.lines}</div>
+      </div>
+    </div>
+  );
+
+  const ZoneTable = ({ c, accent }) => (
+    <div style={{ marginBottom:14 }}>
+      <div style={{ fontSize:12, fontWeight:800, color:accent, marginBottom:6 }}>{c.label} — {c.length} km</div>
+      <table style={{ width:'100%', borderCollapse:'collapse' }}>
+        <thead><tr>
+          <th style={OV_TH}>Zone</th><th style={OV_TH}>Chainage</th><th style={OV_TH}>Depth</th>
+          <th style={{...OV_TH, textAlign:'right'}}>Exc. (m³)</th>
+        </tr></thead>
+        <tbody>
+          {c.zones.map((z,i)=>(
+            <tr key={i} style={{ background: i%2 ? C.pearl : C.white }}>
+              <td style={{...OV_TD, fontWeight:700, color:C.navy}}>{z[0]}</td>
+              <td style={{...OV_TD, fontFamily:"'IBM Plex Mono', monospace", fontSize:10.5}}>{z[1]}</td>
+              <td style={OV_TD}>{z[2]}</td>
+              <td style={{...OV_TD, fontFamily:"'IBM Plex Mono', monospace", textAlign:'right'}}>{z[3]}</td>
+            </tr>
+          ))}
+          <tr style={{ background:C.navy }}>
+            <td style={{...OV_TD, color:C.lime, fontWeight:700, borderBottom:'none'}} colSpan={3}>TOTAL</td>
+            <td style={{...OV_TD, color:C.lime, fontWeight:700, fontFamily:"'IBM Plex Mono', monospace", textAlign:'right', borderBottom:'none'}}>{c.excTotal}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const BackfillTable = ({ c, accent }) => (
+    <div style={{ marginBottom:14 }}>
+      <div style={{ fontSize:12, fontWeight:800, color:accent, marginBottom:6 }}>{c.label}</div>
+      <table style={{ width:'100%', borderCollapse:'collapse' }}>
+        <thead><tr>
+          <th style={OV_TH}>Backfill Layer</th><th style={{...OV_TH, textAlign:'right'}}>Theoretical (m³)</th>
+        </tr></thead>
+        <tbody>
+          {c.backfill.map((b,i)=>(
+            <tr key={i} style={{ background: i%2 ? C.pearl : C.white }}>
+              <td style={{...OV_TD, fontWeight:600}}>{b[0]}</td>
+              <td style={{...OV_TD, fontFamily:"'IBM Plex Mono', monospace", textAlign:'right'}}>{b[1]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <div style={{ maxWidth:1180, margin:'0 auto', padding:'18px 20px' }}>
 
       {/* HERO */}
-      <div style={{ background:`linear-gradient(135deg, ${C.navy} 0%, #141480 100%)`, borderRadius:6, borderLeft:`4px solid ${C.lime}`, padding:'26px 28px', color:C.white, marginBottom:18 }}>
-        <div style={{ fontSize:10, fontWeight:700, letterSpacing:'0.16em', color:C.lime, textTransform:'uppercase' }}>Northfield South (NFS) Project</div>
-        <div style={{ fontSize:30, fontWeight:700, margin:'6px 0 4px', lineHeight:1.05 }}>East Corridor Pipeline Trenching</div>
-        <div style={{ fontSize:13, color:'rgba(255,255,255,0.78)', maxWidth:760, lineHeight:1.5 }}>
-          Nearshore-to-offshore trenching, conduit installation and backfilling along the East Corridor — twin 36&quot; trunklines with piggybacked conduit and MEG line, from shore (KP 0.000) to KP 2.180.
+      <div style={{ background:`linear-gradient(135deg, ${C.navy} 0%, #141480 100%)`, borderRadius:6, borderLeft:`4px solid ${C.lime}`, padding:'26px 28px', color:C.white, marginBottom:18, position:'relative' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:16 }}>
+          <div style={{ minWidth:0 }}>
+            <div style={{ fontSize:10, fontWeight:700, letterSpacing:'0.16em', color:C.lime, textTransform:'uppercase' }}>Northfield South (NFS) Project</div>
+            <div style={{ fontSize:28, fontWeight:700, margin:'6px 0 4px', lineHeight:1.05 }}>Nearshore &amp; Offshore Trenching</div>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,0.78)', maxWidth:680, lineHeight:1.5 }}>
+              Trenching, conduit installation and backfilling works across the project&apos;s two corridors — the East Corridor and the South Corridor — from shore to offshore, including twin trunklines, piggybacked conduit and MEG lines.
+            </div>
+          </div>
+          <div style={{ flexShrink:0, background:C.white, borderRadius:10, padding:'10px', boxShadow:'0 2px 8px rgba(0,0,0,0.18)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <img src={window.MCD_LOGO} alt="McDermott" style={{ width:56, height:56, display:'block', objectFit:'contain' }} />
+          </div>
         </div>
         <div style={{ display:'flex', gap:22, flexWrap:'wrap', marginTop:16, fontSize:11.5 }}>
           <div><span style={{ color:C.softGrey }}>Client</span><br/><strong>QatarEnergy LNG (QELNG)</strong></div>
-          <div><span style={{ color:C.softGrey }}>Contractor</span><br/><strong>McDermott International</strong></div>
+          <div><span style={{ color:C.softGrey }}>Contractor</span><br/><strong>McDermott</strong></div>
           <div><span style={{ color:C.softGrey }}>Sub-Contractor</span><br/><strong>Al Hassanain Gen. Contracting</strong></div>
           <div><span style={{ color:C.softGrey }}>Document Ref.</span><br/><strong>NFS-MCD-MO-MST-00201 Rev. 01</strong></div>
         </div>
@@ -4844,58 +4969,49 @@ function ProjectOverview({ setTab }) {
 
       {showOrg && (
         <div style={{ background:C.white, borderRadius:4, border:`1px solid ${C.lightGrey}`, overflow:'hidden', marginBottom:18 }}>
-          <SectionHeader title="Project Organization Chart" subtitle="Reporting structure — East Corridor" />
+          <SectionHeader title="Project Organization Chart" subtitle="Reporting structure — NFS Project" />
           <div style={{ padding:'18px' }}><OrgChart /></div>
         </div>
       )}
 
-      {/* KEY FACTS */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:12, marginBottom:18 }}>
-        <OvFact label="Trench Length" value="2.180" unit="km" accent={C.navy} />
-        <OvFact label="Chainage" value="KP 0.000 – 2.180" accent={C.qeBlue} />
-        <OvFact label="Total Theoretical Excavation" value="71,505" unit="m³" accent={C.qeTeal} />
-        <OvFact label="Trunklines" value={'2 × 36"'} accent={C.amber} />
-        <OvFact label="Water Depth Range" value="0 – 8" unit="m" accent={C.lime} />
+      {/* TWO-CORRIDOR SNAPSHOT */}
+      <div style={{ fontSize:11, fontWeight:700, letterSpacing:'0.1em', color:C.softGrey, textTransform:'uppercase', margin:'0 0 10px' }}>Project Corridors</div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px,1fr))', gap:14, marginBottom:18 }}>
+        <CorridorFacts c={corridors.east}  accent={C.qeBlue} />
+        <CorridorFacts c={corridors.south} accent={C.qeTeal} />
       </div>
 
-      {/* PIPELINES */}
-      <OvAccordion title="Pipelines & Scope" subtitle="What is being installed in the trench" accent={C.qeBlue} defaultOpen={true}>
-        <ul style={{ margin:0, paddingLeft:18, fontSize:12.5, color:C.charcoal, lineHeight:1.85 }}>
-          <li>Twin 36&quot; trunklines <strong>TL23</strong> &amp; <strong>TL24</strong> (main product lines).</li>
-          <li>Piggybacked 12&quot; <strong>SC26</strong> conduit alongside the trunklines.</li>
-          <li>Piggybacked 6&quot; <strong>MP26 MEG</strong> (mono-ethylene glycol) line.</li>
-          <li>Scope: trench excavation, pipe-lay support, conduit installation and backfilling (sand bedding, soil backfill, rock cover).</li>
-          <li>Two construction areas: <strong>Area 1</strong> (KP 0.000–1.120, 0–2.5 m WD — land excavator + EEX) and <strong>Area 2</strong> (KP 1.120–2.180, 2.5–8 m WD — excavator barge).</li>
-        </ul>
+      {/* PIPELINES & SCOPE */}
+      <OvAccordion title="Pipelines & Scope" subtitle="What is being installed in each corridor" accent={C.qeBlue} defaultOpen={true}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px,1fr))', gap:18 }}>
+          {['east','south'].map((k,idx)=>(
+            <div key={k}>
+              <div style={{ fontSize:12, fontWeight:800, color: idx? C.qeTeal : C.qeBlue, marginBottom:6 }}>{corridors[k].label}</div>
+              <ul style={{ margin:0, paddingLeft:18, fontSize:12, color:C.charcoal, lineHeight:1.8 }}>
+                {corridors[k].pipelines.map((p,i)=><li key={i}>{p}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
       </OvAccordion>
 
-      {/* TRENCH ZONES */}
-      <OvAccordion title="Trench Design & Zones" subtitle="Click to view zone-by-zone breakdown" accent={C.qeTeal}>
-        <table style={{ width:'100%', borderCollapse:'collapse' }}>
-          <thead><tr>
-            <th style={OV_TH}>Zone</th><th style={OV_TH}>Chainage</th><th style={OV_TH}>Trench Depth</th>
-            <th style={{...OV_TH, textAlign:'right'}}>Theoretical Exc. (m³)</th>
-          </tr></thead>
-          <tbody>
-            {zones.map((z,i)=>(
-              <tr key={i} style={{ background: i%2 ? C.pearl : C.white }}>
-                <td style={{...OV_TD, fontWeight:700, color:C.navy}}>{z[0]}</td>
-                <td style={{...OV_TD, fontFamily:"'IBM Plex Mono', monospace"}}>{z[1]}</td>
-                <td style={OV_TD}>{z[2]}</td>
-                <td style={{...OV_TD, fontFamily:"'IBM Plex Mono', monospace", textAlign:'right'}}>{z[3]}</td>
-              </tr>
-            ))}
-            <tr style={{ background:C.navy }}>
-              <td style={{...OV_TD, color:C.lime, fontWeight:700, borderBottom:'none'}} colSpan={3}>TOTAL</td>
-              <td style={{...OV_TD, color:C.lime, fontWeight:700, fontFamily:"'IBM Plex Mono', monospace", textAlign:'right', borderBottom:'none'}}>71,504.85</td>
-            </tr>
-          </tbody>
-        </table>
-        <div style={{ fontSize:10.5, color:C.softGrey, marginTop:8 }}>Side slopes 2:1 (Area 1) / 1:1 (Area 2). Tolerances: alignment ±0.50 m, bottom elevation +0/–0.50 m.</div>
+      {/* TRENCH ZONES — both corridors */}
+      <OvAccordion title="Trench Design & Zones" subtitle="Zone-by-zone breakdown per corridor" accent={C.qeTeal}>
+        <ZoneTable c={corridors.east}  accent={C.qeBlue} />
+        <ZoneTable c={corridors.south} accent={C.qeTeal} />
+        <div style={{ fontSize:10.5, color:C.softGrey, marginTop:4 }}>Side slopes 2:1 (Area 1) / 1:1 (Area 2). Tolerances: alignment ±0.50 m, bottom elevation +0/–0.50 m, bottom width –0/+1.00 m, bedding ±0.25 m.</div>
       </OvAccordion>
 
-      {/* EQUIPMENT */}
-      <OvAccordion title="Equipment Fleet" subtitle="Primary plant & marine spread" accent={C.amber}>
+      {/* BACKFILL QUANTITIES — both corridors */}
+      <OvAccordion title="Backfilling — Theoretical Quantities" subtitle="Sand bedding, soil backfill & rock cover per corridor" accent={C.lime}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px,1fr))', gap:18 }}>
+          <BackfillTable c={corridors.east}  accent={C.qeBlue} />
+          <BackfillTable c={corridors.south} accent={C.qeTeal} />
+        </div>
+      </OvAccordion>
+
+      {/* EQUIPMENT (shared) */}
+      <OvAccordion title="Equipment Fleet" subtitle="Primary plant & marine spread (shared across corridors)" accent={C.amber}>
         <table style={{ width:'100%', borderCollapse:'collapse' }}>
           <thead><tr>
             <th style={OV_TH}>Equipment</th><th style={OV_TH}>Role</th>
@@ -4911,14 +5027,14 @@ function ProjectOverview({ setTab }) {
             ))}
           </tbody>
         </table>
-        <div style={{ fontSize:10.5, color:C.softGrey, marginTop:8 }}>Marine spread incl. backhoe dredgers (BHD1 from KP 2.080 to shore, BHD2 from KP 1.120 offshore — meeting halfway) and support tugs.</div>
+        <div style={{ fontSize:10.5, color:C.softGrey, marginTop:8 }}>Marine spread incl. backhoe dredgers and support tugs. EEX Hyundai 520LC max 2.20 m WD; Hitachi ZX890 max 3.70 m WD.</div>
       </OvAccordion>
 
-      {/* ADJACENT ASSETS & SAFETY */}
+      {/* ADJACENT ASSETS & SAFETY (shared) */}
       <OvAccordion title="Adjacent Assets & Marine Safety" subtitle="Existing pipelines, marker buoys, silt control" accent={C.crimson}>
         <ul style={{ margin:0, paddingLeft:18, fontSize:12.5, color:C.charcoal, lineHeight:1.85 }}>
-          <li>32&quot; QG pipeline — 10.9 m west of TL23 centerline.</li>
-          <li>38&quot; QGII pipeline — 37.2 m (0 m WD) to 46.5 m (8 m WD) east of TL24 centerline.</li>
+          <li>32" QG pipeline — 10.9 m west of TL23 centerline.</li>
+          <li>38" QGII pipeline — 37.2 m (0 m WD) to 46.5 m (8 m WD) east of TL24 centerline.</li>
           <li>Marker buoys: A-3 surface (53.5 kg, red) + A-0 underwater, at 25 m spacing, 2 m from asset centerline (±30 cm).</li>
           <li>Silt curtain (~280 m perimeter per BHD) installed where water depth ≥ 2.5 m LAT.</li>
         </ul>
@@ -5012,7 +5128,7 @@ function App() {
       case 'permits':   return <PermitsRegister store={store} onUpdate={onUpdate} key={`pm-${version}`} />;
       case 'lookahead': return <LookAhead store={store} onUpdate={onUpdate} key={`la-${version}`} />;
       case 'dprviewer': return <DPRViewer store={store} key={`dv-${version}-${mdCorridor}`} />;
-      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} key={`inp-${version}-${mdCorridor}`} />;
+      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} corridor={mdCorridor === 'overall' ? 'south' : mdCorridor} setCorridor={setMdCorridor} key={`inp-${version}-${mdCorridor}`} />;
       default: return null;
     }
   }, [tab, version, tweaks, dashCorridor, mdCorridor]);
