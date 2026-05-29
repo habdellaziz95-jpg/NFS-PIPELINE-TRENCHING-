@@ -268,25 +268,13 @@ class NFSDataStore {
 
   // East has no survey of its own yet. If it inherited the South/DEFAULT survey
   // numbers, clear them so the East dashboard shows no false variance.
-  // East has no survey of its own yet. If a survey value was inherited from the
-  // South corridor (or the baked-in DEFAULT), clear it so East shows no false variance.
-  // Each value is checked independently.
+  // East corridor has no survey reconciliation — ALWAYS zero out surveyed values on load.
   _healEast() {
     const e = this.corridors && this.corridors.east && this.corridors.east.inputs;
-    const s = this.corridors && this.corridors.south && this.corridors.south.inputs;
     if (!e) return false;
-    const isInherited = (val, key) => {
-      const v = Number(val) || 0;
-      if (!v) return false;
-      if (v === Number(DEFAULT_INPUTS[key])) return true;       // matches baked-in default
-      if (s && v === Number(s[key]))         return true;       // matches South's current survey
-      return false;
-    };
-    let changed = false;
-    if (isInherited(e.surveyedNear, 'surveyedNear')) { e.surveyedNear = 0; changed = true; }
-    if (isInherited(e.surveyedOff,  'surveyedOff'))  { e.surveyedOff  = 0; changed = true; }
-    if (changed) { e.surveyDate = ""; e.surveySource = ""; }
-    return changed;
+    const hadValue = Number(e.surveyedNear) || Number(e.surveyedOff);
+    e.surveyedNear = 0; e.surveyedOff = 0; e.surveyDate = ""; e.surveySource = "";
+    return !!hadValue;
   }
 
   load() {
@@ -2044,9 +2032,12 @@ function exportFullReport(store) {
     <div class="section-title">Cumulative Excavation (m³) — dashed lines = surveyed reference</div>
     <canvas id="c1" style="width:100%;height:80mm;"></canvas>
 
-    <div class="section-title">Daily Production + Manpower</div>
-    <canvas id="c2" style="width:100%;height:60mm;"></canvas>
-    <div style="font-size:7pt;color:#8E9AAF;margin-top:2px;font-style:italic;">▲ markers indicate survey reconciliations (not actual production).</div>
+    <div class="section-title">Daily Production (m³)</div>
+    <canvas id="c2a" style="width:100%;height:50mm;"></canvas>
+
+    <div class="section-title">Daily Manpower</div>
+    <canvas id="c2b" style="width:100%;height:40mm;"></canvas>
+    <div style="font-size:7pt;color:#8E9AAF;margin-top:2px;font-style:italic;">▲ markers indicate survey reconciliations.</div>
 
     <div class="section-title">Scope Completion (real-progress activities only)</div>
     <div style="padding:4px 4px;">
@@ -2218,31 +2209,33 @@ function exportFullReport(store) {
         }
       });
 
-      // Chart 2 — Daily production + manpower (Y >= 0; manpower 0-200 on right)
-      new Chart(document.getElementById('c2'), {
+      // Chart 2a — Daily Production (stacked bars, no manpower)
+      new Chart(document.getElementById('c2a'), {
         type: 'bar',
         data: { labels: dataPayload.labels, datasets: [
           { label: 'Nearshore (m³)', data: dataPayload.nearTod, backgroundColor: navy, stack: 'p' },
           { label: 'Offshore (m³)',  data: dataPayload.offTod,  backgroundColor: teal, stack: 'p' },
-          { type: 'line', label: 'Manpower (0–200)', data: dataPayload.mp, borderColor: orange, borderWidth: 2, pointRadius: 1, yAxisID: 'mp', tension: 0.3, fill: false },
-          {
-            type: 'scatter',
-            label: 'Survey adjustment',
-            data: dataPayload.adjustments,
-            backgroundColor: red,
-            borderColor: red,
-            pointStyle: 'triangle',
-            radius: 7,
-            rotation: 180,
-            showLine: false,
-          },
         ]},
         options: { responsive: false, maintainAspectRatio: false,
           plugins: { legend: { labels: { font: { size: 9 } } } },
           scales: {
             x: { stacked: true, ticks: { font: { size: 7 }, maxRotation: 45 } },
             y: { stacked: true, beginAtZero: true, ticks: { font: { size: 8 } } },
-            mp: { position: 'right', grid: { drawOnChartArea: false }, min: 0, max: 200, ticks: { font: { size: 8 }, stepSize: 50 } }
+          }
+        }
+      });
+
+      // Chart 2b — Daily Manpower (line chart)
+      new Chart(document.getElementById('c2b'), {
+        type: 'line',
+        data: { labels: dataPayload.labels, datasets: [
+          { label: 'Total Manpower', data: dataPayload.mp, borderColor: orange, backgroundColor: 'rgba(230,131,58,0.1)', borderWidth: 2, pointRadius: 1, tension: 0.3, fill: true },
+        ]},
+        options: { responsive: false, maintainAspectRatio: false,
+          plugins: { legend: { labels: { font: { size: 9 } } } },
+          scales: {
+            x: { ticks: { font: { size: 7 }, maxRotation: 45 } },
+            y: { beginAtZero: true, min: 0, ticks: { font: { size: 8 }, stepSize: 50 } },
           }
         }
       });
