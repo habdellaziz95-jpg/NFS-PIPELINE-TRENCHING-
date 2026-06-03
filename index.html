@@ -1294,8 +1294,9 @@ function EditableCell({ value, type, options, onChange, align, fmt }) {
         display: 'block', width: '100%', cursor: 'text',
         minHeight: 14, color: value !== null && value !== '' ? C.inputBlue : C.softGrey,
         textAlign: align || 'center', fontSize: 9,
+        whiteSpace: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis',
       }}
-      title="Click to edit"
+      title={displayVal !== '' && displayVal !== null ? String(displayVal) : 'Click to edit'}
     >
       {displayVal !== '' && displayVal !== null ? String(displayVal) : '—'}
     </span>
@@ -1950,9 +1951,9 @@ function exportFullReport(store) {
     .team-card .name { font-size: 9.5pt; font-weight: 700; color: #190AAF; margin-top: 1px; }
 
     .events-box { background: #F5F8FF; border-left: 4px solid #92DA48; padding: 8px 12px; margin-top: 4px; max-height: 90mm; overflow: hidden; }
-    .event-item { font-size: 8pt; line-height: 1.6; margin-bottom: 3px; padding-bottom: 3px; border-bottom: 1px dashed #ECEFF4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-item { font-size: 8pt; line-height: 1.4; margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px dashed #ECEFF4; }
     .event-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .event-item .ev-meta { font-size: 7pt; color: #0066B3; font-weight: 700; margin-right: 8px; }
+    .event-item .ev-meta { font-size: 7pt; color: #0066B3; font-weight: 700; }
 
     @media print {
       .controls { display: none }
@@ -2202,7 +2203,10 @@ function exportFullReport(store) {
         <div class="events-box">
           ${notableEvents.length === 0
             ? '<div style="font-size:8pt;color:#8E9AAF;font-style:italic;">No notable events recorded in the last 7 DPRs.</div>'
-            : notableEvents.map(e => `<div class="event-item"><span class="ev-meta">DPR-${e.dpr} · ${fmtDDMMMYYYY(e.date)}</span>${e.note.replace(/\s*\|\s*/g, ' · ')}</div>`).join('')}
+            : notableEvents.map(e => `<div class="event-item">
+                <div class="ev-meta">DPR-${e.dpr} · ${fmtDDMMMYYYY(e.date)}</div>
+                <div>${e.note.length > 240 ? e.note.slice(0, 240) + '…' : e.note}</div>
+              </div>`).join('')}
         </div>
       </div>
     </div>
@@ -4419,7 +4423,7 @@ function MasterDatabase({ store, onUpdate, tweaks, corridor='south', setCorridor
     { label:'TBT',       key:'tbt',     type:'number', width:36 },
     { label:'Incidents', key:'incidents', type:'number', width:54, bold:true,
       color:r=>(r.incidents>0?C.crimson:C.green) },
-    { label:'Notes', key:'notes', type:'text', width:160, wrap:true, align:'left' },
+    { label:'Notes', key:'notes', type:'text', width:240, wrap:false, align:'left' },
     { label:'DPR', key:'_pdf', editable:false, width:40,
       render:(r,ri)=>(
         <Btn size="xs" variant="ghost" onClick={()=>setDprModal(r)}>PDF</Btn>
