@@ -1166,11 +1166,20 @@ function NFSTable({ cols, rows, onEdit, rowStyle, stickyHeader = true, compact =
     background: rowIdx % 2 === 0 ? C.white : C.pearl,
     verticalAlign: 'middle',
     whiteSpace: col.wrap ? 'normal' : 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   });
+
+  const totalW = cols.reduce((s, c) => s + (c.width || 60), 0);
 
   return (
     <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 480 }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+      <table style={{ width: '100%', minWidth: totalW, borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+        <colgroup>
+          {cols.map((col, ci) => (
+            <col key={ci} style={{ width: col.width || 60 }} />
+          ))}
+        </colgroup>
         <thead>
           <tr>
             {cols.map((col, ci) => (
@@ -1242,18 +1251,20 @@ function EditableCell({ value, type, options, onChange, align, fmt }) {
   const displayVal = fmt ? formatVal(value, fmt) : (value ?? '');
 
   if (type === 'select' && options) {
+    // Tolerate imported values not present in the options list (e.g. "Sunny")
+    const opts = (value && !options.includes(value)) ? [value, ...options] : options;
     return (
       <select
-        value={value || ''}
+        value={value ?? ''}
         onChange={e => onChange(e.target.value)}
         style={{
-          width: '100%', border: 'none', background: 'transparent',
-          fontSize: 9, color: C.inputBlue, cursor: 'pointer',
-          textAlign: align || 'center',
+          width: '100%', border: '1px solid rgba(25,10,175,0.15)', borderRadius: 3,
+          background: '#FFFFFF', fontSize: 9, color: C.inputBlue, cursor: 'pointer',
+          textAlign: 'left', padding: '1px 15px 1px 4px', appearance: 'auto',
         }}
       >
         <option value=""></option>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
+        {opts.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
     );
   }
@@ -3215,9 +3226,9 @@ function importFromExcel(file, store, onDone, onError) {
           ngtHrs:     findCol(hmap, 'ngthrs', 'nighthrs'),
           totalMP:    findCol(hmap, 'totalmp'),
           equip:      findCol(hmap, 'equip', 'equipment'),
-          weatherDT:  findCol(hmap, 'weatherdthrs', 'weatherdt', 'weatherdowntime', 'wdt'),
+          weatherDT:  findCol(hmap, 'weatheraffectedhrs', 'weatheraffected', 'weatherdthrs', 'weatherdt', 'weatherdowntime', 'wdt'),
           downtimeReason: findCol(hmap, 'downtimereason', 'dtreason', 'reason'),
-          gpsDT:      findCol(hmap, 'gpsdthrs', 'gpsdt', 'gpsdgpsdthrs', 'dgpsdt'),
+          gpsDT:      findCol(hmap, 'gpsaffectedhrs', 'gpsaffected', 'gpsdthrs', 'gpsdt', 'gpsdgpsdthrs', 'dgpsdt'),
           safeHrs:    findCol(hmap, 'safehrs', 'safemanhrs', 'safemanhours'),
           cumSafeHrs: findCol(hmap, 'cumsafehrs', 'cumhrs', 'cumsafemanhrs', 'cumsafemanhours'),
           permits:    findCol(hmap, 'permits'),
@@ -4382,14 +4393,14 @@ function MasterDatabase({ store, onUpdate, tweaks, corridor='south', setCorridor
     ? rows.filter(r => r.date.includes(filter) || String(r.dprNo).includes(filter) || (r.notes||'').toLowerCase().includes(filter.toLowerCase()))
     : rows;
 
-  const WEATHER_TYPES = ['Clear','Hazy','Cloudy','Rainy','Foggy','Windy'];
+  const WEATHER_TYPES = ['Sunny','Clear','Hazy','Cloudy','Rainy','Foggy','Windy'];
 
   const cols = [
     { label:'DPR', key:'dprNo', type:'number', width:36, bold:true, color:r=>(r.incidents>0?C.crimson:C.qeBlue) },
-    { label:'Date', key:'date', type:'date', width:88, fmt:null },
-    { label:'Day', key:'day', width:32, editable:false, color:()=>C.softGrey },
-    { label:'Rain', key:'rain', type:'select', options:['No','Yes'], width:36 },
-    { label:'Type', key:'type', type:'select', options:WEATHER_TYPES, width:60 },
+    { label:'Date', key:'date', type:'date', width:100, fmt:null },
+    { label:'Day', key:'day', width:40, editable:false, color:()=>C.softGrey },
+    { label:'Rain', key:'rain', type:'select', options:['No','Yes'], width:50 },
+    { label:'Type', key:'type', type:'select', options:WEATHER_TYPES, width:82 },
     { label:'T°Max', key:'tMax', type:'number', width:44 },
     { label:'T°Min', key:'tMin', type:'number', width:44 },
     { label:'Off Today', key:'offshoreToday', type:'number', fmt:'#,##0.0', width:60 },
