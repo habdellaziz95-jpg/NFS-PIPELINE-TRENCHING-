@@ -3129,19 +3129,26 @@ function exportSnapshot(store, tweaks) {
 
 function fmtDateFromExcel(val) {
   if (val === null || val === undefined || val === '') return '';
-  if (val instanceof Date && !isNaN(val.getTime())) return val.toISOString().slice(0, 10);
+  // Helper: YYYY-MM-DD from a Date using LOCAL time (avoids UTC-shift in UTC+3 / Qatar)
+  const localYMD = d => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  if (val instanceof Date && !isNaN(val.getTime())) return localYMD(val);
   if (typeof val === 'string') {
     const t = val.trim();
     if (/^\d{4}-\d{2}-\d{2}/.test(t)) return t.slice(0, 10);
     const d = new Date(t);
-    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+    if (!isNaN(d.getTime())) return localYMD(d);
     return t;
   }
   if (typeof val === 'number') {
     // Excel serial date
     const ms = (val - 25569) * 86400 * 1000;
     const d = new Date(ms);
-    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+    if (!isNaN(d.getTime())) return localYMD(d);
   }
   return String(val);
 }
@@ -4042,16 +4049,16 @@ function Dashboard({ store, tweaks, onEditSettings, corridor='overall', setCorri
       {/* ─── CORRIDOR SELECTOR ─── */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
         <CorridorSwitch value={corridor} onChange={c => setCorridor && setCorridor(c)} options={[
-          { id:'overall', label:'Overall' }, { id:'east', label:'East Corridor' }, { id:'south', label:'South Corridor' }
+          { id:'south', label:'South Corridor' }, { id:'east', label:'East Corridor' }
         ]} />
         <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
           <span style={{ fontSize:11, color:C.softGrey, fontFamily:"'IBM Plex Mono', monospace" }}>
-            {corridor === 'overall' ? 'East + South combined' : (corridor === 'east' ? 'East Corridor only' : 'South Corridor only')}
+            {corridor === 'east' ? 'East Corridor only' : 'South Corridor only'}
           </span>
           <button onClick={() => exportFullReport(store)} style={{
             background:C.navy, color:C.white, border:`1px solid ${C.lime}`, borderRadius:4,
             padding:'7px 14px', fontSize:12, fontWeight:700, cursor:'pointer' }}>
-            ⊞ Generate {corridor === 'overall' ? 'Overall' : (corridor === 'east' ? 'East' : 'South')} Report
+            ⊞ Generate {corridor === 'east' ? 'East' : 'South'} Report
           </button>
         </div>
       </div>
@@ -5227,7 +5234,7 @@ function App() {
   const [version, setVersion] = useState(0);
   const [toast,   setToast]   = useState(null);
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  const [dashCorridor, setDashCorridor] = useState('overall');  // Dashboard: overall | east | south
+  const [dashCorridor, setDashCorridor] = useState('south');   // Dashboard: east | south
   const [mdCorridor,   setMdCorridor]   = useState('south');    // Master DB: south | east
 
   const store = window.nfsStore;
@@ -5288,7 +5295,7 @@ function App() {
     // Set the active corridor on the store before rendering corridor-aware views
     if (tab === 'dashboard')      store.corridor = dashCorridor;
     else if (tab === 'database')  store.corridor = mdCorridor;
-    else if (tab === 'dprviewer' || tab === 'inputs') store.corridor = (mdCorridor === 'overall' ? 'south' : mdCorridor);
+    else if (tab === 'dprviewer' || tab === 'inputs') store.corridor = mdCorridor;
     else store.corridor = 'south';
     switch(tab) {
       case 'overview':  return <ProjectOverview setTab={setTab} key={`ov-${version}`} />;
@@ -5297,7 +5304,7 @@ function App() {
       case 'permits':   return <PermitsRegister store={store} onUpdate={onUpdate} key={`pm-${version}`} />;
       case 'lookahead': return <LookAhead store={store} onUpdate={onUpdate} key={`la-${version}`} />;
       case 'dprviewer': return <DPRViewer store={store} key={`dv-${version}-${mdCorridor}`} />;
-      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} corridor={mdCorridor === 'overall' ? 'south' : mdCorridor} setCorridor={setMdCorridor} key={`inp-${version}-${mdCorridor}`} />;
+      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} corridor={mdCorridor} setCorridor={setMdCorridor} key={`inp-${version}-${mdCorridor}`} />;
       default: return null;
     }
   }, [tab, version, tweaks, dashCorridor, mdCorridor]);
