@@ -483,14 +483,13 @@ class NFSDataStore {
     const gpsDT = sumOf(log, 'gpsDT');
     const weatherDT = sumOf(log, 'weatherDT');
     const totalDT = weatherDT + gpsDT;
-    // Site downtime — days with zero production (Fridays ARE working days; only Weather DT is excluded on Fridays)
-    // Counted whenever no production happened AND manpower was deployed on site.
+    // Site downtime — ANY reported day with zero production counts (incl. holidays/Eid),
+    // regardless of whether manpower was logged that day.
     const siteDowntimeDays = log.filter(r => {
       const prod = (r.nearshoreToday || 0) + (r.offshoreToday || 0)
                  + (r.offTrenchToday || 0) + (r.nearTrenchToday || 0)
                  + (r.rockOffToday   || 0) + (r.rockOnToday    || 0);
-      const hasMP = ((r.indMP || 0) + (r.dayMP || 0) + (r.ngtMP || 0)) > 0;
-      return hasMP && prod === 0;
+      return r.date && prod === 0;
     }).length;
     // Reported vs Surveyed variance (Reported = peak cumulative; Surveyed = saved value)
     // East corridor has no survey reconciliation yet → never show survey/variance for East.
@@ -1802,13 +1801,12 @@ function exportFullReport(store) {
   const totalWeatherDT = sumT(log, 'weatherDT');
   const totalGPSDT     = sumT(log, 'gpsDT');
   const totalDT        = totalWeatherDT + totalGPSDT;
-  // Site downtime — all days with zero production (Fridays INCLUDED)
+  // Site downtime — ANY reported day with zero production counts (incl. holidays/Eid), regardless of manpower
   const siteDowntimeDays = log.filter(r => {
     const prod = (r.nearshoreToday || 0) + (r.offshoreToday || 0)
                + (r.offTrenchToday || 0) + (r.nearTrenchToday || 0)
                + (r.rockOffToday || 0)   + (r.rockOnToday || 0);
-    const hasMP = ((r.indMP || 0) + (r.dayMP || 0) + (r.ngtMP || 0)) > 0;
-    return hasMP && prod === 0;
+    return r.date && prod === 0;
   }).length;
   // Equipment latest non-empty (with the date that count was logged)
   const _equipRow = [...log].reverse().find(r => (r.equip || 0) > 0);
@@ -4941,30 +4939,58 @@ const OV_TD = { padding:'7px 9px', borderBottom:`1px solid ${C.lightGrey}`, font
 
 function OrgChart() {
   const box = (role, name, color) => (
-    <div style={{ background:C.white, border:`1px solid ${C.lightGrey}`, borderTop:`3px solid ${color}`, borderRadius:4, padding:'10px 14px', minWidth:170, textAlign:'center', boxShadow:'0 1px 3px rgba(10,10,46,0.06)' }}>
-      <div style={{ fontSize:8.5, fontWeight:600, color:C.softGrey, textTransform:'uppercase', letterSpacing:'0.07em' }}>{role}</div>
-      <div style={{ fontSize:13, fontWeight:700, color:C.navy, marginTop:3 }}>{name}</div>
+    <div style={{ background:C.white, border:`1px solid ${C.lightGrey}`, borderTop:`3px solid ${color}`, borderRadius:4, padding:'8px 12px', minWidth:148, textAlign:'center', boxShadow:'0 1px 3px rgba(10,10,46,0.06)' }}>
+      <div style={{ fontSize:8, fontWeight:600, color:C.softGrey, textTransform:'uppercase', letterSpacing:'0.06em' }}>{role}</div>
+      <div style={{ fontSize:12.5, fontWeight:700, color:C.navy, marginTop:3 }}>{name}</div>
     </div>
   );
-  const conn = <div style={{ width:2, height:20, background:C.lightGrey, margin:'0 auto' }} />;
+  const conn = <div style={{ width:2, height:18, background:C.lightGrey, margin:'2px auto' }} />;
+  const Tier = ({ children }) => (
+    <div style={{ display:'flex', gap:12, flexWrap:'wrap', justifyContent:'center', marginTop:8 }}>{children}</div>
+  );
+  const groupLabel = (t) => (
+    <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:C.softGrey, margin:'16px 0 2px', textAlign:'center' }}>{t}</div>
+  );
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'8px 0' }}>
-      {box('Project Director', 'Pathi, Soumya', C.navy)}{conn}
-      {box('Senior Project Manager', 'Moustafa, Haythem M.', C.qeBlue)}{conn}
-      {box('Construction Manager', 'Riyad', C.qeTeal)}{conn}
-      <div style={{ display:'flex', gap:16, flexWrap:'wrap', justifyContent:'center' }}>
-        {box('Dredging & Trenching Specialist', 'Noro, Antonio', C.amber)}
-        {box('Construction Specialist', 'Hussein', C.lime)}
-      </div>
-      <div style={{ marginTop:14, fontSize:10, color:C.softGrey, textAlign:'center' }}>
-        Sub-Contractor: Al Hassanain General Contracting&nbsp;&nbsp;·&nbsp;&nbsp;Client: QatarEnergy LNG (QELNG)
+      {box('Sn. Project Manager', 'Haythem Mustafa', C.navy)}{conn}
+      <Tier>
+        {box('Al Hassanain Trenching PM', 'Parwej Khan', C.amber)}
+        {box('Trenching Lead', 'Riyad Alnazli', C.qeBlue)}
+        {box('HSE Lead', 'Sebastian', C.crimson)}
+      </Tier>
+
+      {groupLabel('Trenching — reports to Trenching Lead')}
+      <Tier>
+        {box('South Trench Lead', 'Antonio Noro', C.qeTeal)}
+        {box('Survey Specialist', 'Ahmed Youssef', C.qeBlue)}
+        {box('East Trench Lead', 'Joel Jacob', C.qeTeal)}
+      </Tier>
+      <Tier>
+        {box('Field Engineer · Night', 'Abouzour, Mishaal H.', C.softGrey)}
+        {box('Site Supervisor · Day', 'Elhadad, Abdalla', C.softGrey)}
+        {box('Site Supervisor · Day', 'Hussien Abdulziz', C.softGrey)}
+        {box('Field Engineer · Night', 'Ali Alatwi', C.softGrey)}
+      </Tier>
+
+      {groupLabel('HSE — reports to HSE Lead')}
+      <Tier>
+        {box('HSE Specialist · Night', 'Orkhan Azizov', C.crimson)}
+        {box('HSE Specialist · Day', 'Simil Soman', C.crimson)}
+        {box('HSE Specialist · Day', 'Javidan Valiyev', C.crimson)}
+        {box('HSE Specialist · Night', 'Pradumn Kulkarni', C.crimson)}
+      </Tier>
+
+      <div style={{ marginTop:16, fontSize:10, color:C.softGrey, textAlign:'center', lineHeight:1.6 }}>
+        Client: QatarEnergy LNG&nbsp;·&nbsp;Contractor: McDermott&nbsp;·&nbsp;Sub-Contractor: Al Hassanain General Contracting<br/>
+        EPCI of Pipelines &amp; Cables — North Field South (NFS)&nbsp;·&nbsp;Contract No. LTC/C/NFS/6034/23
       </div>
     </div>
   );
 }
 
 function ProjectOverview({ setTab }) {
-  const [showOrg, setShowOrg] = useState(false);
+  const [showOrg, setShowOrg] = useState(true);
 
   // ── Per-corridor data (from Method Statement NFS-MCD-MO-MST-00201 Rev. 01) ──
   const corridors = {
