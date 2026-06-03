@@ -4945,48 +4945,84 @@ const OV_TH = { background:C.navy, color:C.lime, fontSize:9, fontWeight:600, tex
 const OV_TD = { padding:'7px 9px', borderBottom:`1px solid ${C.lightGrey}`, fontSize:12, color:C.charcoal };
 
 function OrgChart() {
-  const box = (role, name, color) => (
-    <div style={{ background:C.white, border:`1px solid ${C.lightGrey}`, borderTop:`3px solid ${color}`, borderRadius:4, padding:'8px 12px', minWidth:148, textAlign:'center', boxShadow:'0 1px 3px rgba(10,10,46,0.06)' }}>
-      <div style={{ fontSize:8, fontWeight:600, color:C.softGrey, textTransform:'uppercase', letterSpacing:'0.06em' }}>{role}</div>
-      <div style={{ fontSize:12.5, fontWeight:700, color:C.navy, marginTop:3 }}>{name}</div>
+  const MAROON = '#8B1E3F', LEAD = '#0033CC';
+
+  const card = (role, name, bg, fg) => (
+    <div style={{ background:bg, border: bg==='#fff' ? '1px solid #ccc' : `1px solid ${bg}`,
+      borderRadius:4, padding:'8px 11px', minWidth:140, textAlign:'center',
+      boxShadow:'0 1px 3px rgba(0,0,0,0.12)' }}>
+      <div style={{ fontSize:7.5, fontWeight:700, color: fg==='#fff' ? 'rgba(255,255,255,0.72)' : '#888',
+        textTransform:'uppercase', letterSpacing:'0.06em', lineHeight:1.3 }}>{role}</div>
+      <div style={{ fontSize:12, fontWeight:700, color:fg, marginTop:2, lineHeight:1.3 }}>{name}</div>
     </div>
   );
-  const conn = <div style={{ width:2, height:18, background:C.lightGrey, margin:'2px auto' }} />;
-  const Tier = ({ children }) => (
-    <div style={{ display:'flex', gap:12, flexWrap:'wrap', justifyContent:'center', marginTop:8 }}>{children}</div>
+
+  const vLine = <div style={{ width:2, height:16, background:'#bbb', margin:'2px auto' }} />;
+
+  const Row = ({ children, gap=10 }) => (
+    <div style={{ display:'flex', gap, flexWrap:'wrap', justifyContent:'center', alignItems:'flex-start' }}>
+      {children}
+    </div>
   );
-  const groupLabel = (t) => (
-    <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:C.softGrey, margin:'16px 0 2px', textAlign:'center' }}>{t}</div>
+  const Col = ({ children }) => (
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+      {children}
+    </div>
   );
+
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'8px 0' }}>
-      {box('Sn. Project Manager', 'Haythem Mustafa', C.navy)}{conn}
-      <Tier>
-        {box('Al Hassanain Trenching PM', 'Parwej Khan', C.amber)}
-        {box('Trenching Lead', 'Riyad Alnazli', C.qeBlue)}
-        {box('HSE Lead', 'Sebastian', C.crimson)}
-      </Tier>
 
-      {groupLabel('Trenching — reports to Trenching Lead')}
-      <Tier>
-        {box('South Trench Lead', 'Antonio Noro', C.qeTeal)}
-        {box('Survey Specialist', 'Ahmed Youssef', C.qeBlue)}
-        {box('East Trench Lead', 'Joel Jacob', C.qeTeal)}
-      </Tier>
-      <Tier>
-        {box('Field Engineer · Night', 'Abouzour, Mishaal H.', C.softGrey)}
-        {box('Site Supervisor · Day', 'Elhadad, Abdalla', C.softGrey)}
-        {box('Site Supervisor · Day', 'Hussien Abdulziz', C.softGrey)}
-        {box('Field Engineer · Night', 'Ali Alatwi', C.softGrey)}
-      </Tier>
+      {/* PM */}
+      {card('Sn. Project Manager', 'Haythem Mustafa', MAROON, '#fff')}
+      {vLine}
 
-      {groupLabel('HSE — reports to HSE Lead')}
-      <Tier>
-        {box('HSE Specialist · Night', 'Orkhan Azizov', C.crimson)}
-        {box('HSE Specialist · Day', 'Simil Soman', C.crimson)}
-        {box('HSE Specialist · Day', 'Javidan Valiyev', C.crimson)}
-        {box('HSE Specialist · Night', 'Pradumn Kulkarni', C.crimson)}
-      </Tier>
+      {/* TL + HSEL (same level) */}
+      <Row gap={20}>
+
+        {/* ── Trenching branch ── */}
+        <Col>
+          {card('Trenching Lead', 'Riyad Alnazli', LEAD, '#fff')}
+          {vLine}
+          <Row gap={10}>
+            {/* South */}
+            <Col>
+              {card('South Trench Lead', 'Antonio Noro', LEAD, '#fff')}
+              {vLine}
+              <Row>
+                {card('Field Engineer · Night', 'Abouzour, Mishaal H.', '#fff', '#1a1a2e')}
+                {card('Site Supervisor · Day', 'Elhadad, Abdalla', '#fff', '#1a1a2e')}
+              </Row>
+            </Col>
+            {/* Survey */}
+            <Col>
+              {card('Survey Specialist', 'Ahmed Youssef', LEAD, '#fff')}
+            </Col>
+            {/* East */}
+            <Col>
+              {card('East Trench Lead', 'Joel Jacob', LEAD, '#fff')}
+              {vLine}
+              <Row>
+                {card('Site Supervisor · Day', 'Hussien Abdulziz', '#fff', '#1a1a2e')}
+                {card('Field Engineer · Night', 'Ali Alatwi', '#fff', '#1a1a2e')}
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+
+        {/* ── HSE branch ── */}
+        <Col>
+          {card('HSE Lead', 'Sebastian', LEAD, '#fff')}
+          {vLine}
+          <Row gap={8}>
+            {card('HSE Spec · Night', 'Orkhan Azizov',    '#fff', '#1a1a2e')}
+            {card('HSE Spec · Day',   'Simil Soman',      '#fff', '#1a1a2e')}
+            {card('HSE Spec · Day',   'Javidan Valiyev',  '#fff', '#1a1a2e')}
+            {card('HSE Spec · Night', 'Pradumn Kulkarni', '#fff', '#1a1a2e')}
+          </Row>
+        </Col>
+
+      </Row>
 
       <div style={{ marginTop:16, fontSize:10, color:C.softGrey, textAlign:'center', lineHeight:1.6 }}>
         Client: QatarEnergy LNG&nbsp;·&nbsp;Contractor: McDermott&nbsp;·&nbsp;Sub-Contractor: Al Hassanain General Contracting<br/>
