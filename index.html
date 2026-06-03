@@ -1950,9 +1950,9 @@ function exportFullReport(store) {
     .team-card .name { font-size: 9.5pt; font-weight: 700; color: #190AAF; margin-top: 1px; }
 
     .events-box { background: #F5F8FF; border-left: 4px solid #92DA48; padding: 8px 12px; margin-top: 4px; max-height: 90mm; overflow: hidden; }
-    .event-item { font-size: 8pt; line-height: 1.4; margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px dashed #ECEFF4; }
+    .event-item { font-size: 8pt; line-height: 1.6; margin-bottom: 3px; padding-bottom: 3px; border-bottom: 1px dashed #ECEFF4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .event-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .event-item .ev-meta { font-size: 7pt; color: #0066B3; font-weight: 700; }
+    .event-item .ev-meta { font-size: 7pt; color: #0066B3; font-weight: 700; margin-right: 8px; }
 
     @media print {
       .controls { display: none }
@@ -2202,10 +2202,7 @@ function exportFullReport(store) {
         <div class="events-box">
           ${notableEvents.length === 0
             ? '<div style="font-size:8pt;color:#8E9AAF;font-style:italic;">No notable events recorded in the last 7 DPRs.</div>'
-            : notableEvents.map(e => `<div class="event-item">
-                <div class="ev-meta">DPR-${e.dpr} · ${fmtDDMMMYYYY(e.date)}</div>
-                <div>${e.note.length > 240 ? e.note.slice(0, 240) + '…' : e.note}</div>
-              </div>`).join('')}
+            : notableEvents.map(e => `<div class="event-item"><span class="ev-meta">DPR-${e.dpr} · ${fmtDDMMMYYYY(e.date)}</span>${e.note.replace(/\s*\|\s*/g, ' · ')}</div>`).join('')}
         </div>
       </div>
     </div>
