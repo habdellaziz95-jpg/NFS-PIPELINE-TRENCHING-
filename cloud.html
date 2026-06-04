@@ -5459,22 +5459,33 @@ function SplashLoading({ msg }) {
 }
 
 function LoginScreen() {
+  const [mode, setMode]     = React.useState('signin'); // signin | signup
   const [email, setEmail]   = React.useState('');
-  const [status, setStatus] = React.useState('idle'); // idle | sending | sent | error
+  const [pass, setPass]     = React.useState('');
+  const [busy, setBusy]     = React.useState(false);
   const [err, setErr]       = React.useState('');
+  const [note, setNote]     = React.useState('');
 
-  const send = async () => {
+  const submit = async () => {
     const e = email.trim().toLowerCase();
     if (!e || e.indexOf('@') < 0) { setErr('Please enter a valid email address.'); return; }
-    setStatus('sending'); setErr('');
+    if (!pass || pass.length < 6) { setErr('Password must be at least 6 characters.'); return; }
+    setBusy(true); setErr(''); setNote('');
     try {
-      const { error } = await sb.auth.signInWithOtp({
-        email: e,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
-      });
-      if (error) { setErr(error.message); setStatus('error'); }
-      else setStatus('sent');
-    } catch (ex) { setErr(String(ex && ex.message ? ex.message : ex)); setStatus('error'); }
+      if (mode === 'signup') {
+        const { error } = await sb.auth.signUp({ email: e, password: pass });
+        if (error) { setErr(error.message); }
+        else {
+          // try to sign in right away (works when email confirmation is OFF)
+          const { error: e2 } = await sb.auth.signInWithPassword({ email: e, password: pass });
+          if (e2) setNote('Account created. You can now sign in.');
+        }
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email: e, password: pass });
+        if (error) setErr(error.message);
+      }
+    } catch (ex) { setErr(String(ex && ex.message ? ex.message : ex)); }
+    setBusy(false);
   };
 
   return (
@@ -5485,32 +5496,40 @@ function LoginScreen() {
           <div style={{ fontSize:11, color:CC.grey, marginTop:4 }}>North Field South — McDermott · QatarEnergy LNG</div>
         </div>
         <div style={{ padding:'24px' }}>
-          {status === 'sent' ? (
-            <div>
-              <div style={{ fontSize:15, fontWeight:700, color:CC.navy }}>Check your email ✉️</div>
-              <div style={{ fontSize:13, color:'#555', marginTop:10, lineHeight:1.6 }}>
-                We sent a sign-in link to <b>{email}</b>. Open it on this device to sign in.
-              </div>
-              <button onClick={() => { setStatus('idle'); }} style={{ marginTop:16, background:'none', border:'none', color:CC.blue, fontSize:12, cursor:'pointer', textDecoration:'underline' }}>Use a different email</button>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize:15, fontWeight:700, color:CC.navy, marginBottom:6 }}>Sign in</div>
-              <div style={{ fontSize:12, color:'#666', marginBottom:14 }}>Enter your work email and we'll send you a one-time sign-in link.</div>
-              <input
-                type="email" value={email} placeholder="name@mcdermott.com"
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') send(); }}
-                style={{ width:'100%', boxSizing:'border-box', padding:'11px 12px', fontSize:14, border:'1px solid #ccc', borderRadius:8, outline:'none' }}
-              />
-              {err && <div style={{ color:'#C0392B', fontSize:12, marginTop:8 }}>{err}</div>}
-              <button onClick={send} disabled={status==='sending'}
-                style={{ width:'100%', marginTop:14, padding:'12px', fontSize:14, fontWeight:700, color:CC.white,
-                  background: status==='sending' ? CC.grey : CC.navy, border:'none', borderRadius:8, cursor:'pointer' }}>
-                {status==='sending' ? 'Sending…' : 'Send sign-in link'}
-              </button>
-            </div>
-          )}
+          <div style={{ display:'flex', gap:6, marginBottom:18 }}>
+            <button onClick={() => { setMode('signin'); setErr(''); setNote(''); }}
+              style={{ flex:1, padding:'8px', fontSize:13, fontWeight:700, borderRadius:8, cursor:'pointer',
+                border: mode==='signin' ? 'none' : '1px solid #ddd',
+                background: mode==='signin' ? CC.navy : CC.white, color: mode==='signin' ? CC.white : '#555' }}>
+              Sign in
+            </button>
+            <button onClick={() => { setMode('signup'); setErr(''); setNote(''); }}
+              style={{ flex:1, padding:'8px', fontSize:13, fontWeight:700, borderRadius:8, cursor:'pointer',
+                border: mode==='signup' ? 'none' : '1px solid #ddd',
+                background: mode==='signup' ? CC.navy : CC.white, color: mode==='signup' ? CC.white : '#555' }}>
+              Create account
+            </button>
+          </div>
+
+          <label style={{ fontSize:11, fontWeight:700, color:'#666' }}>Work email</label>
+          <input type="email" value={email} placeholder="name@mcdermott.com"
+            onChange={e => setEmail(e.target.value)}
+            style={{ width:'100%', boxSizing:'border-box', padding:'11px 12px', fontSize:14, border:'1px solid #ccc', borderRadius:8, outline:'none', marginTop:4, marginBottom:12 }} />
+
+          <label style={{ fontSize:11, fontWeight:700, color:'#666' }}>Password</label>
+          <input type="password" value={pass} placeholder="At least 6 characters"
+            onChange={e => setPass(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') submit(); }}
+            style={{ width:'100%', boxSizing:'border-box', padding:'11px 12px', fontSize:14, border:'1px solid #ccc', borderRadius:8, outline:'none', marginTop:4 }} />
+
+          {err  && <div style={{ color:'#C0392B', fontSize:12, marginTop:10 }}>{err}</div>}
+          {note && <div style={{ color:'#1E7E34', fontSize:12, marginTop:10 }}>{note}</div>}
+
+          <button onClick={submit} disabled={busy}
+            style={{ width:'100%', marginTop:16, padding:'12px', fontSize:14, fontWeight:700, color:CC.white,
+              background: busy ? CC.grey : CC.navy, border:'none', borderRadius:8, cursor:'pointer' }}>
+            {busy ? 'Please wait…' : (mode==='signup' ? 'Create account & sign in' : 'Sign in')}
+          </button>
         </div>
       </div>
     </div>
