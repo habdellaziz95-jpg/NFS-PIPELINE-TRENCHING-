@@ -5268,6 +5268,7 @@ function ProjectOverview({ setTab }) {
 function App() {
   const [tab,     setTab]     = useState('overview');
   const [version, setVersion] = useState(0);
+  const [dataKey, setDataKey] = useState(0); // bumped ONLY on wholesale data replacement (import) — cell edits must not remount the tab
   const [toast,   setToast]   = useState(null);
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [dashCorridor, setDashCorridor] = useState('south');   // Dashboard: east | south
@@ -5289,6 +5290,7 @@ function App() {
   const onImportJSON = (file) => {
     store.importJSON(file).then(() => {
       setVersion(v=>v+1);
+      setDataKey(k => k + 1);
       setToast('Data imported successfully!');
     }).catch(() => setToast('Import failed — invalid file'));
   };
@@ -5314,6 +5316,7 @@ function App() {
       store,
       (dprCount, permitCount, laCount, scopeCount) => {
         setVersion(v => v + 1);
+        setDataKey(k => k + 1);
         const parts = [];
         if (dprCount)    parts.push(`${dprCount} DPR rows`);
         if (permitCount) parts.push(`${permitCount} permits`);
@@ -5334,16 +5337,16 @@ function App() {
     else if (tab === 'dprviewer' || tab === 'inputs') store.corridor = mdCorridor;
     else store.corridor = 'south';
     switch(tab) {
-      case 'overview':  return <ProjectOverview setTab={setTab} key={`ov-${version}`} />;
-      case 'dashboard': return <Dashboard store={store} tweaks={tweaks} onEditSettings={()=>setTab('inputs')} corridor={dashCorridor} setCorridor={setDashCorridor} key={`dash-${version}-${dashCorridor}`} />;
-      case 'database':  return <MasterDatabase store={store} onUpdate={onUpdate} tweaks={tweaks} corridor={mdCorridor} setCorridor={setMdCorridor} onImportExcel={onImportExcel} key={`db-${version}-${mdCorridor}`} />;
-      case 'permits':   return <PermitsRegister store={store} onUpdate={onUpdate} key={`pm-${version}`} />;
-      case 'lookahead': return <LookAhead store={store} onUpdate={onUpdate} key={`la-${version}`} />;
-      case 'dprviewer': return <DPRViewer store={store} key={`dv-${version}-${mdCorridor}`} />;
-      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} corridor={mdCorridor} setCorridor={setMdCorridor} key={`inp-${version}-${mdCorridor}`} />;
+      case 'overview':  return <ProjectOverview setTab={setTab} key={`ov-${dataKey}`} />;
+      case 'dashboard': return <Dashboard store={store} tweaks={tweaks} onEditSettings={()=>setTab('inputs')} corridor={dashCorridor} setCorridor={setDashCorridor} key={`dash-${dataKey}-${dashCorridor}`} />;
+      case 'database':  return <MasterDatabase store={store} onUpdate={onUpdate} tweaks={tweaks} corridor={mdCorridor} setCorridor={setMdCorridor} onImportExcel={onImportExcel} key={`db-${dataKey}-${mdCorridor}`} />;
+      case 'permits':   return <PermitsRegister store={store} onUpdate={onUpdate} key={`pm-${dataKey}`} />;
+      case 'lookahead': return <LookAhead store={store} onUpdate={onUpdate} key={`la-${dataKey}`} />;
+      case 'dprviewer': return <DPRViewer store={store} key={`dv-${dataKey}-${mdCorridor}`} />;
+      case 'inputs':    return <ExpandedInputs store={store} onUpdate={onUpdate} corridor={mdCorridor} setCorridor={setMdCorridor} key={`inp-${dataKey}-${mdCorridor}`} />;
       default: return null;
     }
-  }, [tab, version, tweaks, dashCorridor, mdCorridor]);
+  }, [tab, version, dataKey, tweaks, dashCorridor, mdCorridor]);
 
   return (
     <div style={{ minHeight:'100vh', background:'#F0F2F5' }}>
